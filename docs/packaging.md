@@ -24,7 +24,7 @@ No file associations are declared for v1 because the app currently implements pr
 Run packaging from the repository root:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File build\scripts\Invoke-Packaging.ps1
+powershell -ExecutionPolicy Bypass -File build\scripts\New-Release.ps1
 ```
 
 The script restores, builds, tests, publishes `win-x64`, creates a portable ZIP, generates a local self-signed MSIX certificate when needed, and writes artifacts under `artifacts\package`.

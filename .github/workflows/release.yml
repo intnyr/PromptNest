@@ -1,0 +1,115 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g. 1.0.0)'
+        required: true
+        default: '1.0.0'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/Directory.Packages.props', 'global.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Resolve version
+        id: ver
+        shell: pwsh
+        run: |
+          if ($env:GITHUB_REF -like 'refs/tags/v*') {
+            $tag = $env:GITHUB_REF -replace 'refs/tags/v',''
+            $semver = $tag
+          } else {
+            $semver = '${{ github.event.inputs.version }}'
+          }
+          $msixVersion = if ($semver -match '^[0-9]+\.[0-9]+\.[0-9]+$') { "$semver.0" } else { "1.0.0.0" }
+          "semver=$semver"          | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          "msix_version=$msixVersion" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+
+      - name: Restore
+        run: dotnet restore PromptNest.sln
+
+      - name: Build
+        run: dotnet build PromptNest.sln --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test PromptNest.sln --configuration Release --no-build --collect:"XPlat Code Coverage" --settings coverlet.runsettings --results-directory artifacts/test-results
+
+      - name: Package (portable ZIP + self-signed MSIX)
+        env:
+          PROMPTNEST_CERT_PASSWORD: ${{ secrets.PROMPTNEST_CERT_PASSWORD || 'PromptNestCi!Password' }}
+        run: |
+          pwsh build\scripts\New-Release.ps1 `
+            -Configuration Release `
+            -Platform x64 `
+            -Version ${{ steps.ver.outputs.msix_version }} `
+            -ArtifactsRoot artifacts/package `
+            -SkipTests
+
+      - name: Install Velopack CLI
+        run: dotnet tool install -g vpk
+
+      - name: Velopack pack
+        shell: pwsh
+        run: |
+          $publishDir = "src/PromptNest.App/bin/Release/net8.0-windows10.0.19041.0/win-x64/publish"
+          $velopackOut = "artifacts/velopack"
+          New-Item -ItemType Directory -Force -Path $velopackOut | Out-Null
+          vpk pack `
+            --packId PromptNest `
+            --packTitle PromptNest `
+            --packVersion ${{ steps.ver.outputs.semver }} `
+            --packAuthors "PromptNest Dev" `
+            --packDir $publishDir `
+            --mainExe PromptNest.App.exe `
+            --runtime win-x64 `
+            --output $velopackOut
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: promptnest-release-${{ steps.ver.outputs.semver }}
+          path: |
+            artifacts/package/*.zip
+            artifacts/package/*.msix
+            artifacts/package/cert/*.cer
+            artifacts/velopack/**
+
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          name: PromptNest ${{ steps.ver.outputs.semver }}
+          generate_release_notes: true
+          files: |
+            artifacts/package/*.zip
+            artifacts/package/*.msix
+            artifacts/package/cert/*.cer
+            artifacts/velopack/*.nupkg
+            artifacts/velopack/RELEASES
+            artifacts/velopack/*.exe
