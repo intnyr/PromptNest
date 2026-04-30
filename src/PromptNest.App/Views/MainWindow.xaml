@@ -1,0 +1,1214 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Window
+    x:Class="PromptNest.App.Views.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="using:PromptNest.App.ViewModels"
+    Title="PromptNest"
+    mc:Ignorable="d">
+    <Grid
+        x:Name="ShellRoot"
+        MinWidth="{StaticResource PromptNestWindowMinWidth}"
+        MinHeight="{StaticResource PromptNestWindowMinHeight}"
+        Background="{StaticResource PromptNestWindowBackgroundBrush}"
+        KeyDown="OnShellRootKeyDown">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="38" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid
+            x:Name="AppTitleBar"
+            Grid.Row="0"
+            Padding="14,0,10,0"
+            Background="{StaticResource PromptNestAppChromeBrush}"
+            BorderBrush="{StaticResource PromptNestBorderMutedBrush}"
+            BorderThickness="0,0,0,1"
+            ColumnSpacing="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Border
+                Width="22"
+                Height="22"
+                VerticalAlignment="Center"
+                Background="{StaticResource PromptNestAccentSubtleBrush}"
+                BorderBrush="{StaticResource PromptNestAccentBrush}"
+                BorderThickness="1"
+                CornerRadius="6">
+                <FontIcon
+                    FontSize="13"
+                    Foreground="{StaticResource PromptNestAccentBrush}"
+                    Glyph="&#xE8D7;" />
+            </Border>
+
+            <TextBlock
+                Grid.Column="1"
+                VerticalAlignment="Center"
+                FontFamily="{StaticResource PromptNestFontFamilyDisplay}"
+                FontSize="{StaticResource PromptNestFontSizeBodyLarge}"
+                FontWeight="SemiBold"
+                Foreground="{StaticResource PromptNestTextPrimaryBrush}"
+                Text="PromptNest" />
+
+            <Grid
+                Grid.Column="2"
+                Width="138"
+                IsHitTestVisible="False">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <FontIcon
+                    Grid.Column="0"
+                    FontSize="12"
+                    Foreground="{StaticResource PromptNestIconDefaultBrush}"
+                    Glyph="&#xE921;" />
+                <FontIcon
+                    Grid.Column="1"
+                    FontSize="12"
+                    Foreground="{StaticResource PromptNestIconDefaultBrush}"
+                    Glyph="&#xE922;" />
+                <FontIcon
+                    Grid.Column="2"
+                    FontSize="12"
+                    Foreground="{StaticResource PromptNestIconDefaultBrush}"
+                    Glyph="&#xE8BB;" />
+            </Grid>
+        </Grid>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="48" />
+                <ColumnDefinition Width="220" />
+                <ColumnDefinition Width="420" />
+                <ColumnDefinition x:Name="EditorColumn" Width="*" MinWidth="420" />
+            </Grid.ColumnDefinitions>
+
+            <ContentControl
+                x:Name="NavigationRailHost"
+                Grid.Column="0"
+                Background="{StaticResource PromptNestNavigationRailBrush}"
+                IsTabStop="False" />
+
+            <ContentControl
+                x:Name="SidebarHost"
+                Grid.Column="1"
+                Background="{StaticResource PromptNestSidebarBrush}"
+                BorderBrush="{StaticResource PromptNestBorderMutedBrush}"
+                BorderThickness="0,0,1,0"
+                IsTabStop="False" />
+
+            <ContentControl
+                x:Name="LibraryHost"
+                Grid.Column="2"
+                Background="{StaticResource PromptNestPaneBrush}"
+                BorderBrush="{StaticResource PromptNestBorderMutedBrush}"
+                BorderThickness="0,0,1,0"
+                IsTabStop="False" />
+
+            <ContentControl
+                x:Name="EditorHost"
+                Grid.Column="3"
+                Background="{StaticResource PromptNestEditorBrush}"
+                IsTabStop="False" />
+
+            <Grid
+                Grid.Column="0"
+                HorizontalAlignment="Center"
+                Margin="0,12,0,0"
+                RowSpacing="12">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Button
+                    Grid.Row="0"
+                    Width="{StaticResource PromptNestRailButtonSize}"
+                    Height="{StaticResource PromptNestRailButtonSize}"
+                    AutomationProperties.Name="Prompt library"
+                    Background="{StaticResource PromptNestSelectedRowBrush}"
+                    BorderBrush="Transparent"
+                    CornerRadius="{StaticResource PromptNestControlRadius}">
+                    <FontIcon
+                        Foreground="{StaticResource PromptNestAccentBrush}"
+                        Glyph="&#xE8A5;" />
+                </Button>
+                <Button
+                    Grid.Row="1"
+                    Width="{StaticResource PromptNestRailButtonSize}"
+                    Height="{StaticResource PromptNestRailButtonSize}"
+                    AutomationProperties.Name="Tags"
+                    Background="Transparent"
+                    BorderBrush="Transparent"
+                    CornerRadius="{StaticResource PromptNestControlRadius}">
+                    <FontIcon
+                        Foreground="{StaticResource PromptNestIconMutedBrush}"
+                        Glyph="&#xE8EC;" />
+                </Button>
+                <Button
+                    Grid.Row="2"
+                    Width="{StaticResource PromptNestRailButtonSize}"
+                    Height="{StaticResource PromptNestRailButtonSize}"
+                    AutomationProperties.Name="Run prompt"
+                    Background="Transparent"
+                    BorderBrush="Transparent"
+                    CornerRadius="{StaticResource PromptNestControlRadius}">
+                    <FontIcon
+                        Foreground="{StaticResource PromptNestIconMutedBrush}"
+                        Glyph="&#xE8B7;" />
+                </Button>
+                <Button
+                    Grid.Row="3"
+                    Width="{StaticResource PromptNestRailButtonSize}"
+                    Height="{StaticResource PromptNestRailButtonSize}"
+                    VerticalAlignment="Bottom"
+                    AutomationProperties.Name="Settings"
+                    Background="Transparent"
+                    BorderBrush="Transparent"
+                    Click="OnSettingsClick"
+                    CornerRadius="{StaticResource PromptNestControlRadius}">
+                    <FontIcon
+                        Foreground="{StaticResource PromptNestIconMutedBrush}"
+                        Glyph="&#xE713;"
+                        ToolTipService.ToolTip="Settings" />
+                </Button>
+                <Button
+                    Grid.Row="4"
+                    Width="{StaticResource PromptNestRailButtonSize}"
+                    Height="{StaticResource PromptNestRailButtonSize}"
+                    AutomationProperties.Name="Help"
+                    Background="Transparent"
+                    BorderBrush="Transparent"
+                    CornerRadius="{StaticResource PromptNestControlRadius}">
+                    <FontIcon
+                        Foreground="{StaticResource PromptNestIconMutedBrush}"
+                        Glyph="&#xE897;" />
+                </Button>
+                <Button
+                    Grid.Row="5"
+                    Width="{StaticResource PromptNestRailButtonSize}"
+                    Height="{StaticResource PromptNestRailButtonSize}"
+                    AutomationProperties.Name="Profile"
+                    Background="Transparent"
+                    BorderBrush="Transparent"
+                    CornerRadius="{StaticResource PromptNestControlRadius}">
+                    <FontIcon
+                        Foreground="{StaticResource PromptNestIconMutedBrush}"
+                        Glyph="&#xE77B;" />
+                </Button>
+            </Grid>
+
+            <Grid
+                Grid.Column="1"
+                Padding="{StaticResource PromptNestPanePadding}"
+                RowSpacing="10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <ListView
+                    Grid.Row="0"
+                    MaxHeight="172"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    ItemsSource="{x:Bind ViewModel.Library.NavigationItems, Mode=OneWay}"
+                    SelectionMode="None">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Button
+                                Height="{StaticResource PromptNestFolderRowHeight}"
+                                Padding="{StaticResource PromptNestFolderRowPadding}"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Stretch"
+                                Background="{Binding IsSelected, Converter={StaticResource BooleanToBrushConverter}, ConverterParameter=SelectedRow}"
+                                BorderBrush="Transparent"
+                                Click="OnNavigationClick"
+                                CornerRadius="{StaticResource PromptNestControlRadius}"
+                                Tag="{Binding Id}">
+                                <Grid ColumnSpacing="8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock
+                                        Foreground="{StaticResource PromptNestTextPrimaryBrush}"
+                                        Text="{Binding Label}" />
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Foreground="{StaticResource PromptNestTextTertiaryBrush}"
+                                        Text="{Binding CountText}" />
+                                </Grid>
+                            </Button>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+
+                <Grid Grid.Row="1" Margin="0,10,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        FontSize="{StaticResource PromptNestFontSizeCaption}"
+                        Foreground="{StaticResource PromptNestTextTertiaryBrush}"
+                        Text="FOLDERS" />
+                    <Button
+                        Grid.Column="1"
+                        Width="28"
+                        Height="28"
+                        AutomationProperties.Name="Add folder"
+                        Background="Transparent"
+                        BorderBrush="Transparent">
+                        <FontIcon
+                            FontSize="12"
+                            Foreground="{StaticResource PromptNestIconMutedBrush}"
+                            Glyph="&#xE710;" />
+                    </Button>
+                </Grid>
+
+                <ListView
+                    Grid.Row="2"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    ItemsSource="{x:Bind ViewModel.Library.VisibleFolders, Mode=OneWay}"
+                    SelectionMode="None">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid
+                                Height="{StaticResource PromptNestFolderRowHeight}"
+                                Padding="{Binding IndentPixels, Converter={StaticResource DepthToPaddingConverter}}"
+                                ColumnSpacing="6">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="24" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Button
+                                    Width="24"
+                                    Height="24"
+                                    Background="Transparent"
+                                    BorderBrush="Transparent"
+                                    Click="OnFolderToggleClick"
+                                    IsEnabled="{Binding HasChildren}"
+                                    Tag="{Binding Id}">
+                                    <FontIcon
+                                        FontSize="10"
+                                        Foreground="{StaticResource PromptNestIconMutedBrush}"
+                                        Glyph="{Binding IsExpanded, Converter={StaticResource FolderChevronGlyphConverter}}" />
+                                </Button>
+                                <Button
+                                    Grid.Column="1"
+                                    HorizontalAlignment="Stretch"
+                                    HorizontalContentAlignment="Stretch"
+                                    Background="{Binding IsSelected, Converter={StaticResource BooleanToBrushConverter}, ConverterParameter=SelectedRow}"
+                                    BorderBrush="Transparent"
+                                    Click="OnFolderClick"
+                                    CornerRadius="{StaticResource PromptNestControlRadius}"
+                                    Tag="{Binding Id}">
+                                    <TextBlock
+                                        Foreground="{StaticResource PromptNestTextSecondaryBrush}"
+                                        Text="{Binding Name}" />
+                                </Button>
+                                <TextBlock
+                                    Grid.Column="2"
+                                    VerticalAlignment="Center"
+                                    Foreground="{StaticResource PromptNestTextTertiaryBrush}"
+                                    Text="{Binding CountText}" />
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+
+                <TextBlock
+                    Grid.Row="3"
+                    Margin="0,10,0,0"
+                    FontSize="{StaticResource PromptNestFontSizeCaption}"
+                    Foreground="{StaticResource PromptNestTextTertiaryBrush}"
+                    Text="COLLECTIONS" />
+
+                <ListView
+                    Grid.Row="4"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    ItemsSource="{x:Bind ViewModel.Library.Collections, Mode=OneWay}"
+                    SelectionMode="None">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Button
+                                Height="{StaticResource PromptNestFolderRowHeight}"
+                                Padding="{StaticResource PromptNestFolderRowPadding}"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Stretch"
+                                Background="{Binding IsSelected, Converter={StaticResource BooleanToBrushConverter}, ConverterParameter=SelectedRow}"
+                                BorderBrush="Transparent"
+                                Click="OnCollectionClick"
+                                CornerRadius="{StaticResource PromptNestControlRadius}"
+                                Tag="{Binding Id}">
+                                <Grid ColumnSpacing="8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock
+                                        Foreground="{StaticResource PromptNestTextSecondaryBrush}"
+                                        Text="{Binding Label}" />
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Foreground="{StaticResource PromptNestTextTertiaryBrush}"
+                                        Text="{Binding CountText}" />
+                                </Grid>
+                            </Button>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </Grid>
+
+            <Grid
+                Grid.Column="2"
+                Padding="{StaticResource PromptNestToolbarPadding}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="54" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0">
+                    <TextBox
+                        x:Name="SearchBox"
+                        Padding="42,0,86,0"
+                        AutomationProperties.AutomationId="PromptNest.SearchBox"
+                        KeyDown="OnSearchBoxKeyDown"
+                        PlaceholderText="Search prompts"
+                        Style="{StaticResource PromptNestSearchBoxStyle}"
+                        TextChanged="OnSearchTextChanged" />
+                    <FontIcon
+                        Margin="14,0,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        FontSize="14"
+                        Foreground="{StaticResource PromptNestIconMutedBrush}"
+                        Glyph="&#xE721;" />
+                    <StackPanel
+                        Margin="0,0,10,0"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        Orientation="Horizontal"
+                        Spacing="6">
+                        <Button
+                            Width="54"
+                            Height="24"
+                            AutomationProperties.Name="Focus search"
+                            Background="{StaticResource PromptNestPaneElevatedBrush}"
+                            BorderBrush="{StaticResource PromptNestBorderMutedBrush}"
+                            Click="OnFocusSearchClick"
+                            Content="Ctrl+K"
+                            FontSize="{StaticResource PromptNestFontSizeCaption}"
+                            Padding="4,0" />
+                        <Button
+                            Width="24"
+                            Height="24"
+                            AutomationProperties.Name="Clear search"
+                            Background="Transparent"
+                            BorderBrush="Transparent"
+                            Click="OnClearSearchClick"
+                            Padding="0">
+                            <FontIcon FontSize="10" Glyph="&#xE711;" />
+                        </Button>
+                    </StackPanel>
+                </Grid>
+
+                <Grid
+                    Grid.Row="1"
+                    Margin="0,6,0,8"
+                    ColumnSpacing="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button
+                            AutomationProperties.AutomationId="PromptNest.NewPromptButton"
+                            Content="New"
+                            Click="OnNewPromptClick"
+                            MinWidth="72"
+                            Height="{StaticResource PromptNestIconButtonSize}"
+                            Background="{StaticResource PromptNestAccentBrush}"
+                            BorderBrush="Transparent"
+                            CornerRadius="{StaticResource PromptNestControlRadius}"
+                            Foreground="{StaticResource PromptNestIconSelectedBrush}" />
+                        <Button
+                            AutomationProperties.AutomationId="PromptNest.DuplicatePromptButton"
+                            Content="Duplicate"
+                            Click="OnDuplicateClick"
+                            Height="{StaticResource PromptNestIconButtonSize}"
+                            Padding="10,0"
+                            Background="Transparent"
+                            BorderBrush="Transparent"
+                            CornerRadius="{StaticResource PromptNestControlRadius}"
+                            Foreground="{StaticResource PromptNestTextPrimaryBrush}" />
+                        <Button
+                            Content="Folder"
+                            Click="OnNewFolderClick"
+                            Height="{StaticResource PromptNestIconButtonSize}"
+                            Padding="10,0"
+                            Background="Transparent"
+                            BorderBrush="Transparent"
+                            CornerRadius="{StaticResource PromptNestControlRadius}"
+                            Foreground="{StaticResource PromptNestTextPrimaryBrush}" />
+                        <Button
+                            Content="Tags"
+                            Click="OnManageTagsClick"
+                            Height="{StaticResource PromptNestIconButtonSize}"
+                            Padding="10,0"
+                            Background="Transparent"
+                            BorderBrush="Transparent"
+                            CornerRadius="{StaticResource PromptNestControlRadius}"
+                            Foreground="{StaticResource PromptNestTextPrimaryBrush}" />
+                        <Button
+                            Width="{StaticResource PromptNestIconButtonSize}"
+                            Height="{StaticResource PromptNestIconButtonSize}"
+                            AutomationProperties.Name="Filter prompts"
+                            Background="Transparent"
+                            BorderBrush="Transparent"
+                            Click="OnFilterClick"
+                            CornerRadius="{StaticResource PromptNestControlRadius}">
+                            <FontIcon
+                                FontSize="14"
+                                Foreground="{StaticResource PromptNestIconDefaultBrush}"
+                                Glyph="&#xE71C;" />
+                        </Button>
+                        <Button
+                            Width="{StaticResource PromptNestIconButtonSize}"
+                            Height="{StaticResource PromptNestIconButtonSize}"
+                            AutomationProperties.Name="More library actions"
+                            Background="Transparent"
+                            BorderBrush="Transparent"
+                            Click="OnOverflowClick"
+                            CornerRadius="{StaticResource PromptNestControlRadius}">
+                            <FontIcon
+                                FontSize="14"
+                                Foreground="{StaticResource PromptNestIconDefaultBrush}"
+                                Glyph="&#xE712;" />
+                        </Button>
+                    </StackPanel>
+
+                    <Button
+                        x:Name="SortButton"
+                        Grid.Column="1"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        Background="Transparent"
+                        BorderBrush="Transparent"
+                        Click="OnSortClick"
+                        Content="Sort: Relevance"
+                        Foreground="{StaticResource PromptNestTextSecondaryBrush}" />
+                </Grid>
+
+                <Grid
+                    Grid.Row="2"
+                    Margin="0,0,0,6">
+                    <TextBlock
+                        Foreground="{StaticResource PromptNestTextSecondaryBrush}"
+                        Text="{Binding Library.Pagination.ResultCountText}" />
+                    <TextBlock
+                        HorizontalAlignment="Right"
+                        Foreground="{StaticResource PromptNestTextSecondaryBrush}"
+                        Text="{Binding Library.Pagination.RangeText}" />
+                </Grid>
+
+                <ListView
+                    Grid.Row="3"
+                    AutomationProperties.AutomationId="PromptNest.PromptList"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    IsItemClickEnabled="True"
+                    ItemClick="OnPromptItemClick"
+                    ItemsSource="{Binding Library.PromptList}"
+                    SelectionMode="None">
+                    <ListView.ItemContainerStyle>
+                        <Style BasedOn="{StaticResource PromptNestPromptListRowStyle}" TargetType="ListViewItem" />
+                    </ListView.ItemContainerStyle>
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Border
+                                Padding="8"
+                                Background="{Binding IsSelected, Converter={StaticResource BooleanToBrushConverter}, ConverterParameter=SelectedRow}"
+                                BorderBrush="{StaticResource PromptNestBorderMutedBrush}"
+                                BorderThickness="0,0,0,1">
+                                <Grid RowSpacing="7">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <Grid ColumnSpacing="10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock
+                                            FontWeight="SemiBold"
+                                            Foreground="{StaticResource PromptNestTextPrimaryBrush}"
+                                            Text="{Binding Title}"
+                                            TextTrimming="CharacterEllipsis" />
+                                        <TextBlock
+                                            Grid.Column="1"
+                                            Foreground="{StaticResource PromptNestTextTertiaryBrush}"
+                                            Text="{Binding DateText}" />
+                                        <Button
+                                            Grid.Column="2"
+                                            Width="28"
+                                            Height="28"
+                                            AutomationProperties.Name="Toggle favorite"
+                                            Background="Transparent"
+                                            BorderBrush="Transparent"
+                                            Click="OnFavoriteClick"
+                                            Padding="0"
+                                            Tag="{Binding Id}">
+                                            <FontIcon
+                                                FontSize="15"
+                                                Foreground="{StaticResource PromptNestWarningBrush}"
+                                                Glyph="{Binding FavoriteGlyph}" />
+                                        </Button>
+                                    </Grid>
+                                    <TextBlock
+                                        Grid.Row="1"
+                                        Foreground="{StaticResource PromptNestTextSecondaryBrush}"
+                                        MaxLines="2"
+                                        Text="{Binding Preview}"
+                                        TextTrimming="CharacterEllipsis"
+                                        TextWrapping="Wrap" />
+                                    <ItemsControl
+                                        Grid.Row="2"
+                                        ItemsSource="{Binding Tags}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <StackPanel Orientation="Horizontal" Spacing="6" />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Style="{StaticResource PromptNestTagChipStyle}">
+                                                    <TextBlock
+                                                        Foreground="{StaticResource PromptNestTextSecondaryBrush}"
+                                                        Text="{Binding Name}" />
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+
+                <Border
+                    Grid.Row="3"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Visibility="{Binding Library.IsPromptListStateVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <TextBlock
+                        Foreground="{StaticResource PromptNestTextSecondaryBrush}"
+                        Text="{Binding Library.PromptListStateMessage}" />
+                </Border>
+
+                <Grid
+                    Grid.Row="4"
+                    Padding="0,8,0,0">
+                    <StackPanel
+                        HorizontalAlignment="Left"
+                        Orientation="Horizontal"
+                        Spacing="4">
+                        <Button
+                            Width="28"
+                            Height="28"
+                            AutomationProperties.Name="Previous page"
+                            Click="OnPreviousPageClick"
+                            Content="‹" />
+                        <Button
+                            Width="28"
+                            Height="28"
+                            Background="{StaticResource PromptNestAccentBrush}"
+                            BorderBrush="Transparent"
+                            Content="{Binding Library.Pagination.PageNumber}"
+                            Foreground="{StaticResource PromptNestIconSelectedBrush}" />
+                        <Button
+                            Width="28"
+                            Height="28"
+                            AutomationProperties.Name="Next page"
+                            Click="OnNextPageClick"
+                            Content="›" />
+                    </StackPanel>
+                    <TextBlock
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        Foreground="{StaticResource PromptNestTextSecondaryBrush}"
+                        Text="{Binding Library.Pagination.RangeText}" />
+                </Grid>
+                </Grid>
+
+            <Border
+                x:Name="SettingsPane"
+                Grid.Column="3"
+                Width="520"
+                HorizontalAlignment="Right"
+                Background="{StaticResource PromptNestEditorBrush}"
+                BorderBrush="{StaticResource PromptNestBorderMutedBrush}"
+                BorderThickness="1,0,0,0"
+                Padding="18"
+                Visibility="Collapsed">
+                <Grid RowSpacing="14">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Grid>
+                        <TextBlock
+                            FontSize="{StaticResource PromptNestFontSizeTitle}"
+                            FontWeight="SemiBold"
+                            Foreground="{StaticResource PromptNestTextPrimaryBrush}"
+                            Text="Settings" />
+                        <Button
+                            Width="32"
+                            Height="32"
+                            HorizontalAlignment="Right"
+                            AutomationProperties.Name="Close settings"
+                            Background="Transparent"
+                            BorderBrush="Transparent"
+                            Click="OnCloseSettingsClick">
+                        <FontIcon FontSize="12" Glyph="&#xE711;" />
+                        </Button>
+                    </Grid>
+                    <ScrollViewer Grid.Row="1">
+                        <StackPanel Spacing="16">
+                            <StackPanel Spacing="8">
+                                <TextBlock Foreground="{StaticResource PromptNestTextPrimaryBrush}" Text="Appearance" />
+                                <ComboBox SelectedIndex="0">
+                                    <ComboBoxItem Content="System dark" />
+                                    <ComboBoxItem Content="Dark" />
+                                    <ComboBoxItem Content="High contrast aware" />
+                                </ComboBox>
+                            </StackPanel>
+                            <StackPanel Spacing="8">
+                                <TextBlock Foreground="{StaticResource PromptNestTextPrimaryBrush}" Text="Global hotkey" />
+                                <TextBox
+                                    IsReadOnly="True"
+                                    Style="{StaticResource PromptNestSearchBoxStyle}"
+                                    Text="Win+Shift+Space" />
+                            </StackPanel>
+                            <StackPanel Spacing="8">
+                                <TextBlock Foreground="{StaticResource PromptNestTextPrimaryBrush}" Text="Data management" />
+                                <StackPanel Orientation="Horizontal">
+                                    <Button
+                                        Margin="0,0,8,8"
+                                        Content="Import"
+                                        IsEnabled="False"
+                                        ToolTipService.ToolTip="Import UI is wired in P5.3/P6 after picker packaging work." />
+                                    <Button
+                                        Margin="0,0,8,8"
+                                        Content="Export"
+                                        IsEnabled="False"
+                                        ToolTipService.ToolTip="Export UI is wired in P5.3/P6 after picker packaging work." />
+                                    <Button
+                                        Margin="0,0,8,8"
+                                        Content="Create backup"
+                                        IsEnabled="False"
+                                        ToolTipService.ToolTip="Backup entry point is disabled until final file-picker flow is available." />
+                                </StackPanel>
+                                <CheckBox Content="Keep last 7 backups" IsChecked="True" />
+                            </StackPanel>
+                            <StackPanel Spacing="8">
+                                <TextBlock Foreground="{StaticResource PromptNestTextPrimaryBrush}" Text="Updates" />
+                                <ComboBox IsEnabled="False" SelectedIndex="0">
+                                    <ComboBoxItem Content="Stable" />
+                                    <ComboBoxItem Content="Beta" />
+                                    <ComboBoxItem Content="Dev" />
+                                </ComboBox>
+                                <ToggleSwitch
+                                    Header="Automatic update checks"
+                                    IsEnabled="False"
+                                    IsOn="{Binding UpdateChecksEnabled, Mode=OneWay}" />
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <Button Click="OnCheckForUpdatesClick" Content="Check now" />
+                                    <TextBlock
+                                        VerticalAlignment="Center"
+                                        Foreground="{StaticResource PromptNestTextSecondaryBrush}"
+                                        Text="{Binding UpdateChannelText}" />
+                                </StackPanel>
+                                <TextBlock
+                                    Foreground="{StaticResource PromptNestTextTertiaryBrush}"
+                                    Text="{Binding UpdateStatusText}"
+                                    TextWrapping="Wrap" />
+                            </StackPanel>
+                            <StackPanel Spacing="8">
+                                <TextBlock Foreground="{StaticResource PromptNestTextPrimaryBrush}" Text="Tray menu" />
+                                <ItemsControl x:Name="TrayCommandList">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock
+                                                Margin="0,2"
+                                                Foreground="{StaticResource PromptNestTextSecondaryBrush}"
+                                                Text="{Binding}" />
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                            <TextBlock
+                                Foreground="{StaticResource PromptNestTextTertiaryBrush}"
+                                Text="PromptNest v1.0 local-first preview" />
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+
+            <Grid
+                x:Name="EditorPane"
+                Grid.Column="3"
+                Padding="{StaticResource PromptNestPanePadding}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="36" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="56" />
+                </Grid.RowDefinitions>
+
+                <Grid
+                    Grid.Row="0"
+                    BorderBrush="{StaticResource PromptNestBorderMutedBrush}"
+                    BorderThickness="0,0,0,1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Grid>
+                            <Button
+                                Content="Edit"
+                                Foreground="{StaticResource PromptNestTextPrimaryBrush}"
+                                Style="{StaticResource PromptNestCommandTabStyle}" />
+                            <Border
+                                Height="2"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Bottom"
+                                Background="{StaticResource PromptNestAccentBrush}" />
+                        </Grid>
+                        <Button
+                            Content="Preview"
+                            Style="{StaticResource PromptNestCommandTabStyle}" />
+                        <Button
+                            Content="Variables"
+                            Style="{StaticResource PromptNestCommandTabStyle}" />
+                        <Button
+                            Content="History"
+                            Style="{StaticResource PromptNestCommandTabStyle}" />
+                        <Button
+                            Width="{StaticResource PromptNestIconButtonSize}"
+                            Height="{StaticResource PromptNestIconButtonSize}"
+                            AutomationProperties.Name="More editor actions"
+                            Background="Transparent"
+                            BorderBrush="Transparent">
+                            <FontIcon
+                                FontSize="14"
+                                Foreground="{StaticResource PromptNestIconDefaultBrush}"
+                                Glyph="&#xE712;" />
+                        </Button>
+                    </StackPanel>
+                    <Button
+                        Grid.Column="1"
+                        Width="{StaticResource PromptNestIconButtonSize}"
+                        Height="{StaticResource PromptNestIconButtonSize}"
+                        AutomationProperties.Name="Expand editor"
+                        Background="Transparent"
+                        BorderBrush="Transparent">
+                            <FontIcon
+                                FontSize="14"
+                                Foreground="{StaticResource PromptNestIconDefaultBrush}"
+                                Glyph="&#xE740;"
+                                ToolTipService.ToolTip="Expand editor" />
+                    </Button>
+                </Grid>
+
+                <StackPanel
+                    Grid.Row="1"
+                    Margin="0,14,0,12"
+                    Spacing="10">
+                    <TextBlock
+                        Foreground="{StaticResource PromptNestTextPrimaryBrush}"
+                        Text="Title" />
+                    <TextBox
+                        x:Name="TitleBox"
+                        AutomationProperties.AutomationId="PromptNest.TitleBox"
+                        TextChanged="OnTitleTextChanged"
+                        Text="{Binding Library.SelectedPrompt.Title, Mode=OneWay}"
+                        Style="{StaticResource PromptNestSearchBoxStyle}" />
+                    <Grid ColumnSpacing="14">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Spacing="8">
+                            <TextBlock
+                                Foreground="{StaticResource PromptNestTextPrimaryBrush}"
+                                Text="Folder" />
+                            <Button
+                                Height="34"
+                                HorizontalContentAlignment="Stretch"
+                                Background="{StaticResource PromptNestEditorBrush}"
+                                BorderBrush="{StaticResource PromptNestBorderMutedBrush}"
+                                CornerRadius="{StaticResource PromptNestControlRadius}">
+                                <Grid ColumnSpacing="8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <FontIcon
+                                        FontSize="14"
+                                        Foreground="{StaticResource PromptNestIconMutedBrush}"
+                                        Glyph="&#xE8B7;" />
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Foreground="{StaticResource PromptNestTextPrimaryBrush}"
+                                        Text="{Binding Library.SelectedPrompt.FolderPath}"
+                                        TextTrimming="CharacterEllipsis" />
+                                    <FontIcon
+                                        Grid.Column="2"
+                                        FontSize="12"
+                                        Foreground="{StaticResource PromptNestIconMutedBrush}"
+                                        Glyph="&#xE70D;" />
+                                </Grid>
+                            </Button>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Spacing="8">
+                            <TextBlock
+                                Foreground="{StaticResource PromptNestTextPrimaryBrush}"
+                                Text="Tags" />
+                            <Border
+                                MinHeight="34"
+                                Padding="8,5"
+                                Background="{StaticResource PromptNestEditorBrush}"
+                                BorderBrush="{StaticResource PromptNestBorderMutedBrush}"
+                                BorderThickness="1"
+                                CornerRadius="{StaticResource PromptNestControlRadius}">
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <ItemsControl ItemsSource="{Binding Library.SelectedPrompt.Tags}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <StackPanel Orientation="Horizontal" Spacing="6" />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Style="{StaticResource PromptNestTagChipStyle}">
+                                                    <StackPanel Orientation="Horizontal" Spacing="4">
+                                                        <TextBlock
+                                                            Foreground="{StaticResource PromptNestTextSecondaryBrush}"
+                                                            Text="{Binding Name}" />
+                                                        <Button
+                                                            Width="18"
+                                                            Height="18"
+                                                            AutomationProperties.Name="Remove tag"
+                                                            Background="Transparent"
+                                                            BorderBrush="Transparent"
+                                                            Click="OnRemoveTagClick"
+                                                            Padding="0"
+                                                            Tag="{Binding Name}">
+                                                            <FontIcon
+                                                                FontSize="8"
+                                                                Foreground="{StaticResource PromptNestIconMutedBrush}"
+                                                                Glyph="&#xE711;" />
+                                                        </Button>
+                                                    </StackPanel>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                    <TextBox
+                                        x:Name="TagInput"
+                                        MinWidth="92"
+                                        Height="24"
+                                        AutomationProperties.AutomationId="PromptNest.TagInput"
+                                        Background="Transparent"
+                                        BorderThickness="0"
+                                        KeyDown="OnTagInputKeyDown"
+                                        PlaceholderText="Add tag"
+                                        TextChanged="OnTagInputTextChanged" />
+                                </StackPanel>
+                            </Border>
+                            <Border
+                                MaxHeight="116"
+                                Background="{StaticResource PromptNestPaneElevatedBrush}"
+                                BorderBrush="{StaticResource PromptNestBorderMutedBrush}"
+                                BorderThickness="1"
+                                CornerRadius="{StaticResource PromptNestControlRadius}"
+                                Visibility="{Binding Library.IsTagSuggestionOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <ItemsControl ItemsSource="{Binding Library.FilteredTagSuggestions}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Button
+                                                MinHeight="28"
+                                                HorizontalAlignment="Stretch"
+                                                HorizontalContentAlignment="Left"
+                                                Background="Transparent"
+                                                BorderBrush="Transparent"
+                                                Click="OnTagSuggestionClick"
+                                                Content="{Binding}"
+                                                Foreground="{StaticResource PromptNestTextPrimaryBrush}"
+                                                Tag="{Binding}" />
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+
+                <Grid Grid.Row="2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="34" />
+                        <RowDefinition Height="124" />
+                    </Grid.RowDefinitions>
+                    <Grid
+                        Background="{StaticResource PromptNestEditorBrush}"
+                        BorderBrush="{StaticResource PromptNestBorderMutedBrush}"
+                        BorderThickness="1"
+                        ColumnSpacing="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="40" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border
+                            Background="{StaticResource PromptNestPaneBrush}"
+                            BorderBrush="{StaticResource PromptNestBorderMutedBrush}"
+                            BorderThickness="0,0,1,0">
+                            <TextBlock
+                                x:Name="EditorLineNumbers"
+                                Padding="0,10,8,0"
+                                FontFamily="{StaticResource PromptNestFontFamilyEditor}"
+                                FontSize="{StaticResource PromptNestFontSizeEditor}"
+                                Foreground="{StaticResource PromptNestTextTertiaryBrush}"
+                                Text="1"
+                                TextAlignment="Right" />
+                        </Border>
+                        <TextBox
+                            x:Name="PromptBodyEditor"
+                            Grid.Column="1"
+                            AcceptsReturn="True"
+                            AutomationProperties.AutomationId="PromptNest.PromptBodyEditor"
+                            BorderThickness="0"
+                            SelectionChanged="OnPromptBodySelectionChanged"
+                            ScrollViewer.VerticalScrollBarVisibility="Auto"
+                            Text="{Binding Library.SelectedPrompt.Body, Mode=OneWay}"
+                            TextChanged="OnPromptBodyTextChanged"
+                            TextWrapping="Wrap"
+                            Style="{StaticResource PromptNestEditorTextBoxStyle}" />
+                    </Grid>
+
+                    <Grid
+                        Grid.Row="1"
+                        Padding="10,0"
+                        Background="{StaticResource PromptNestEditorBrush}"
+                        BorderBrush="{StaticResource PromptNestBorderMutedBrush}"
+                        BorderThickness="1,0,1,1">
+                        <StackPanel
+                            VerticalAlignment="Center"
+                            Orientation="Horizontal"
+                            Spacing="10">
+                            <TextBlock
+                                x:Name="EditorPositionText"
+                                Style="{StaticResource PromptNestStatusTextStyle}"
+                                Text="Ln 1, Col 1" />
+                            <TextBlock
+                                x:Name="EditorCharacterCountText"
+                                Style="{StaticResource PromptNestStatusTextStyle}"
+                                Text="0 characters" />
+                            <TextBlock
+                                Style="{StaticResource PromptNestStatusTextStyle}"
+                                Text="Markdown" />
+                        </StackPanel>
+                        <StackPanel
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center"
+                            Orientation="Horizontal"
+                            Spacing="8">
+                            <Button
+                                Width="28"
+                                Height="28"
+                                AutomationProperties.Name="Editor text size"
+                                Background="Transparent"
+                                BorderBrush="Transparent"
+                                Content="Aa"
+                                FontSize="{StaticResource PromptNestFontSizeBodySmall}"
+                                Foreground="{StaticResource PromptNestTextSecondaryBrush}" />
+                            <Button
+                                Width="28"
+                                Height="28"
+                                AutomationProperties.Name="Expand prompt editor"
+                                Background="Transparent"
+                                BorderBrush="Transparent"
+                                Padding="0">
+                                <FontIcon
+                                    FontSize="14"
+                                    Foreground="{StaticResource PromptNestIconDefaultBrush}"
+                                    Glyph="&#xE740;" />
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+
+                    <Border
+                        Grid.Row="2"
+                        Margin="0,10,0,0"
+                        Background="{StaticResource PromptNestEditorBrush}"
+                        BorderBrush="{StaticResource PromptNestBorderMutedBrush}"
+                        BorderThickness="1"
+                        CornerRadius="{StaticResource PromptNestControlRadius}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="28" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <Grid
+                                Padding="10,0"
+                                Background="{StaticResource PromptNestPaneBrush}"
+                                ColumnSpacing="10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1.1*" />
+                                    <ColumnDefinition Width="1.5*" />
+                                    <ColumnDefinition Width="0.8*" />
+                                    <ColumnDefinition Width="1.3*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock VerticalAlignment="Center" Style="{StaticResource PromptNestStatusTextStyle}" Text="Name" />
+                                <TextBlock Grid.Column="1" VerticalAlignment="Center" Style="{StaticResource PromptNestStatusTextStyle}" Text="Default" />
+                                <TextBlock Grid.Column="2" VerticalAlignment="Center" Style="{StaticResource PromptNestStatusTextStyle}" Text="Type" />
+                                <TextBlock Grid.Column="3" VerticalAlignment="Center" Style="{StaticResource PromptNestStatusTextStyle}" Text="Preview" />
+                            </Grid>
+                            <ListView
+                                Grid.Row="1"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                ItemsSource="{Binding Library.SelectedPrompt.Variables}"
+                                SelectionMode="None">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid
+                                            MinHeight="40"
+                                            Padding="10,4"
+                                            ColumnSpacing="10">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="1.1*" />
+                                                <ColumnDefinition Width="1.5*" />
+                                                <ColumnDefinition Width="0.8*" />
+                                                <ColumnDefinition Width="1.3*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock
+                                                VerticalAlignment="Center"
+                                                Foreground="{StaticResource PromptNestTextPrimaryBrush}"
+                                                Text="{Binding Name}" />
+                                            <TextBox
+                                                Grid.Column="1"
+                                                Height="30"
+                                                Text="{Binding DefaultValue, Mode=OneWay}" />
+                                            <ComboBox
+                                                Grid.Column="2"
+                                                Height="30"
+                                                SelectedIndex="0">
+                                                <ComboBoxItem Content="text" />
+                                            </ComboBox>
+                                            <TextBox
+                                                Grid.Column="3"
+                                                Height="30"
+                                                Text="{Binding PreviewValue, Mode=OneWay}" />
+                                            <Button
+                                                Grid.Column="4"
+                                                Width="28"
+                                                Height="28"
+                                                AutomationProperties.Name="Variable action"
+                                                Background="Transparent"
+                                                BorderBrush="Transparent"
+                                                IsEnabled="{Binding CanDelete}"
+                                                Padding="0">
+                                                <FontIcon
+                                                    FontSize="12"
+                                                    Foreground="{StaticResource PromptNestIconMutedBrush}"
+                                                    Glyph="&#xE74D;" />
+                                            </Button>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                        </Grid>
+                    </Border>
+                </Grid>
+
+                <Grid
+                    Grid.Row="3"
+                    BorderBrush="{StaticResource PromptNestBorderMutedBrush}"
+                    BorderThickness="0,1,0,0">
+                    <TextBlock
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        Foreground="{Binding Library.Validation.State, Converter={StaticResource ValidationStateToBrushConverter}}"
+                        Style="{StaticResource PromptNestStatusTextStyle}"
+                        Text="{Binding Library.Validation.SummaryText}" />
+                    <StackPanel
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        Orientation="Horizontal"
+                        Spacing="10">
+                        <Button
+                            MinWidth="86"
+                            Height="34"
+                            AutomationProperties.AutomationId="PromptNest.CopyButton"
+                            Background="{StaticResource PromptNestPaneElevatedBrush}"
+                            BorderBrush="Transparent"
+                            Click="OnCopySelectedPromptClick"
+                            Content="Copy"
+                            Foreground="{StaticResource PromptNestTextPrimaryBrush}" />
+                        <Button
+                            MinWidth="86"
+                            Height="34"
+                            AutomationProperties.AutomationId="PromptNest.SaveButton"
+                            Background="{StaticResource PromptNestAccentBrush}"
+                            BorderBrush="Transparent"
+                            Click="OnSaveEditorClick"
+                            Content="Save"
+                            Foreground="{StaticResource PromptNestIconSelectedBrush}"
+                            IsEnabled="{Binding Library.CanSave}" />
+                        <Button
+                            MinWidth="86"
+                            Height="34"
+                            AutomationProperties.AutomationId="PromptNest.CancelButton"
+                            Background="{StaticResource PromptNestPaneElevatedBrush}"
+                            BorderBrush="Transparent"
+                            Click="OnCancelEditorClick"
+                            Content="Cancel"
+                            Foreground="{StaticResource PromptNestTextPrimaryBrush}"
+                            IsEnabled="{Binding Library.CanCancel}" />
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>

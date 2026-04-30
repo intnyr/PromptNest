@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+    <PlatformTarget>x64</PlatformTarget>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" />
+    <PackageReference Include="CommunityToolkit.Mvvm" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="FluentAssertions" />
+    <PackageReference Include="Moq" />
+    <PackageReference Include="Velopack" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\PromptNest.Core\PromptNest.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\src\PromptNest.App\DeepLinks\DeepLinkParser.cs" Link="LinkedDeepLinks\DeepLinkParser.cs" />
+    <Compile Include="..\..\src\PromptNest.App\DeepLinks\DeepLinkRequest.cs" Link="LinkedDeepLinks\DeepLinkRequest.cs" />
+    <Compile Include="..\..\src\PromptNest.App\Shell\VelopackUpdateService.cs" Link="LinkedShell\VelopackUpdateService.cs" />
+    <Compile Include="..\..\src\PromptNest.App\ViewModels\LibraryDesignData.cs" Link="LinkedViewModels\LibraryDesignData.cs" />
+    <Compile Include="..\..\src\PromptNest.App\ViewModels\LibraryModels.cs" Link="LinkedViewModels\LibraryModels.cs" />
+    <Compile Include="..\..\src\PromptNest.App\ViewModels\LibraryViewState.cs" Link="LinkedViewModels\LibraryViewState.cs" />
+    <Compile Include="..\..\src\PromptNest.App\ViewModels\MainViewModel.cs" Link="LinkedViewModels\MainViewModel.cs" />
+    <Compile Include="..\..\src\PromptNest.App\ViewModels\PaletteViewModel.cs" Link="LinkedViewModels\PaletteViewModel.cs" />
+  </ItemGroup>
+
+</Project>

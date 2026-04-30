@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Restore
+        run: dotnet restore PromptNest.sln
+
+      - name: Format
+        run: dotnet format PromptNest.sln --verify-no-changes --no-restore
+
+      - name: Build
+        run: dotnet build PromptNest.sln --configuration Debug --no-restore
+
+      - name: Test with coverage
+        run: dotnet test PromptNest.sln --configuration Debug --no-build --collect:"XPlat Code Coverage" --settings coverlet.runsettings --results-directory artifacts/test-results
+
+      - name: Build smoke tests
+        run: |
+          dotnet restore tests\PromptNest.SmokeTests\PromptNest.SmokeTests.csproj
+          dotnet build tests\PromptNest.SmokeTests\PromptNest.SmokeTests.csproj --configuration Debug --no-restore
+
+      - name: Smoke tests non-interactive mode
+        run: dotnet test tests\PromptNest.SmokeTests\PromptNest.SmokeTests.csproj --configuration Debug --no-build
+
+      - name: Coverage thresholds
+        run: pwsh build\scripts\Test-CoverageThresholds.ps1
+
+      - name: Performance log
+        run: pwsh build\scripts\Measure-Performance.ps1 -Configuration Debug
+
+      - name: Accessibility log
+        run: pwsh build\scripts\Test-Accessibility.ps1
+
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: promptnest-quality-artifacts
+          path: artifacts
