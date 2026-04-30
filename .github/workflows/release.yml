@@ -54,15 +54,21 @@ jobs:
       - name: Restore
         run: dotnet restore PromptNest.sln
 
+      - name: Format
+        run: dotnet format PromptNest.sln --verify-no-changes --no-restore
+
       - name: Build
         run: dotnet build PromptNest.sln --configuration Release --no-restore
 
       - name: Test
         run: dotnet test PromptNest.sln --configuration Release --no-build --collect:"XPlat Code Coverage" --settings coverlet.runsettings --results-directory artifacts/test-results
 
+      - name: Coverage thresholds
+        run: pwsh build\scripts\Test-CoverageThresholds.ps1
+
       - name: Package (portable ZIP + self-signed MSIX)
         env:
-          PROMPTNEST_CERT_PASSWORD: ${{ secrets.PROMPTNEST_CERT_PASSWORD || 'PromptNestCi!Password' }}
+          PROMPTNEST_CERT_PASSWORD: ${{ secrets.PROMPTNEST_CERT_PASSWORD }}
         run: |
           pwsh build\scripts\New-Release.ps1 `
             -Configuration Release `
@@ -77,7 +83,7 @@ jobs:
       - name: Velopack pack
         shell: pwsh
         run: |
-          $publishDir = "src/PromptNest.App/bin/Release/net8.0-windows10.0.19041.0/win-x64/publish"
+          $publishDir = "src/PromptNest.App/bin/x64/Release/net8.0-windows10.0.19041.0/win-x64/publish"
           $velopackOut = "artifacts/velopack"
           New-Item -ItemType Directory -Force -Path $velopackOut | Out-Null
           vpk pack `
@@ -88,7 +94,15 @@ jobs:
             --packDir $publishDir `
             --mainExe PromptNest.App.exe `
             --runtime win-x64 `
-            --output $velopackOut
+            --outputDir $velopackOut
+
+      - name: Verify release artifacts
+        run: |
+          pwsh build\scripts\Test-ReleaseArtifacts.ps1 `
+            -PackageRoot artifacts/package `
+            -VelopackRoot artifacts/velopack `
+            -Version ${{ steps.ver.outputs.msix_version }} `
+            -Platform x64
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -106,6 +120,7 @@ jobs:
         with:
           name: PromptNest ${{ steps.ver.outputs.semver }}
           generate_release_notes: true
+          prerelease: ${{ contains(steps.ver.outputs.semver, '-') }}
           files: |
             artifacts/package/*.zip
             artifacts/package/*.msix
@@ -113,3 +128,9 @@ jobs:
             artifacts/velopack/*.nupkg
             artifacts/velopack/RELEASES
             artifacts/velopack/*.exe
+
+      - name: Verify GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release view v${{ steps.ver.outputs.semver }} --json tagName,name,isPrerelease,assets

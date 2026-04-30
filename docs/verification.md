@@ -36,3 +36,13 @@ Performance writes `artifacts/performance/performance.json`. Accessibility write
 ## Interactive UI Smoke
 
 The interactive UI smoke path is documented in `docs/ui-smoke-tests.md`. It is not part of default CI because it requires an unlocked desktop session.
+
+## Release Verification
+
+Release artifacts are verified with:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File build\scripts\Test-ReleaseArtifacts.ps1 -Version 1.0.0.0
+```
+
+The final v1.0 readiness checklist is tracked in `docs/release-checklist.md`, and the security/privacy release gate is tracked in `docs/security-privacy-checklist.md`.

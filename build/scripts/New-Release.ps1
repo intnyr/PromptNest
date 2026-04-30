@@ -3,8 +3,10 @@ param(
   [string]$Platform = "x64",
   [string]$Version = "1.0.0.0",
   [string]$ArtifactsRoot = "artifacts/package",
+  [int]$MaxArtifactSizeMb = 50,
   [switch]$SkipMsix,
-  [switch]$SkipTests
+  [switch]$SkipTests,
+  [switch]$TrustCertificateForCurrentUser
 )
 
 $ErrorActionPreference = "Stop"
@@ -13,7 +15,7 @@ $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
 Set-Location $repoRoot
 
 $rid = "win-$Platform"
-$publishDir = Join-Path $repoRoot "src\PromptNest.App\bin\$Configuration\net8.0-windows10.0.19041.0\$rid\publish"
+$publishDir = Join-Path $repoRoot "src\PromptNest.App\bin\$Platform\$Configuration\net8.0-windows10.0.19041.0\$rid\publish"
 $artifactsDir = Join-Path $repoRoot $ArtifactsRoot
 $msixStaging = Join-Path $artifactsDir "msix-staging"
 $msixOut = Join-Path $artifactsDir "PromptNest-$Version-$Platform.msix"
@@ -38,10 +40,16 @@ dotnet publish src\PromptNest.App\PromptNest.App.csproj `
   --self-contained false `
   -p:Platform=$Platform `
   -p:WindowsAppSDKSelfContained=true `
+  -p:SatelliteResourceLanguages=en-US `
   -p:GenerateAppxPackageOnBuild=false
 
 if (-not (Test-Path $publishDir)) {
-  throw "Publish output not found at $publishDir"
+  $fallbackPublishDir = Join-Path $repoRoot "src\PromptNest.App\bin\$Configuration\net8.0-windows10.0.19041.0\$rid\publish"
+  if (Test-Path $fallbackPublishDir) {
+    $publishDir = $fallbackPublishDir
+  } else {
+    throw "Publish output not found at $publishDir or $fallbackPublishDir"
+  }
 }
 
 if (Test-Path $zipOut) { Remove-Item $zipOut -Force }
@@ -50,19 +58,26 @@ Write-Host "Portable ZIP: $zipOut"
 
 if ($SkipMsix) { return }
 
-$sdkRoot = "C:\Program Files (x86)\Windows Kits\10\bin"
-$makeAppx = Get-ChildItem -Path $sdkRoot -Recurse -Filter "makeappx.exe" -ErrorAction SilentlyContinue |
+$sdkRoots = @(
+  "C:\Program Files (x86)\Windows Kits\10\bin",
+  (Join-Path $env:USERPROFILE ".nuget\packages\microsoft.windows.sdk.buildtools")
+) | Where-Object { $_ -and (Test-Path $_) }
+
+$makeAppx = Get-ChildItem -Path $sdkRoots -Recurse -Filter "makeappx.exe" -ErrorAction SilentlyContinue |
   Where-Object { $_.FullName -match "\\x64\\" } |
   Sort-Object FullName -Descending |
   Select-Object -First 1
-$signTool = Get-ChildItem -Path $sdkRoot -Recurse -Filter "signtool.exe" -ErrorAction SilentlyContinue |
+$signTool = Get-ChildItem -Path $sdkRoots -Recurse -Filter "signtool.exe" -ErrorAction SilentlyContinue |
   Where-Object { $_.FullName -match "\\x64\\" } |
   Sort-Object FullName -Descending |
   Select-Object -First 1
 
-if (-not $makeAppx -or -not $signTool) {
-  Write-Warning "Windows SDK tools (makeappx.exe / signtool.exe) not found. Skipping MSIX."
-  return
+if (-not $makeAppx) {
+  throw "Windows SDK tool makeappx.exe was not found. Install the Windows 10/11 SDK, restore Microsoft.Windows.SDK.BuildTools, or rerun with -SkipMsix."
+}
+
+if (-not $signTool) {
+  throw "Windows SDK tool signtool.exe was not found. Install the Windows 10/11 SDK, restore Microsoft.Windows.SDK.BuildTools, or rerun with -SkipMsix."
 }
 
 if (Test-Path $msixStaging) { Remove-Item $msixStaging -Recurse -Force }
@@ -73,6 +88,8 @@ $manifestSource = Join-Path $repoRoot "src\PromptNest.App\Package.appxmanifest"
 $manifestDest = Join-Path $msixStaging "AppxManifest.xml"
 [xml]$manifestXml = Get-Content $manifestSource
 $manifestXml.Package.Identity.Version = $Version
+$manifestXml.Package.Applications.Application.Executable = "PromptNest.App.exe"
+$manifestXml.Package.Applications.Application.EntryPoint = "Windows.FullTrustApplication"
 $manifestXml.Save($manifestDest)
 
 "[Files]" | Out-File -Encoding ascii -FilePath $mappingFile
@@ -107,6 +124,11 @@ if (-not (Test-Path $pfxPath)) {
   Export-Certificate -Cert $cert -FilePath $cerPath | Out-Null
 }
 
+if ($TrustCertificateForCurrentUser -and (Test-Path $cerPath)) {
+  Import-Certificate -FilePath $cerPath -CertStoreLocation Cert:\CurrentUser\TrustedPeople | Out-Null
+  Write-Host "Trusted certificate for current user: $cerPath"
+}
+
 if (Test-Path $msixOut) { Remove-Item $msixOut -Force }
 & $makeAppx.FullName pack /v /h SHA256 /f $mappingFile /p $msixOut
 if ($LASTEXITCODE -ne 0) { throw "makeappx pack failed" }
@@ -119,7 +141,18 @@ if (-not $pfxPwd) {
 if ($pfxPwd) {
   & $signTool.FullName sign /fd SHA256 /a /f $pfxPath /p $pfxPwd $msixOut
   if ($LASTEXITCODE -ne 0) { throw "signtool sign failed" }
+} else {
+  throw "PROMPTNEST_CERT_PASSWORD or generated password.txt is required to sign the MSIX."
 }
 
 Write-Host "MSIX: $msixOut"
 Write-Host "Cert: $cerPath"
+
+foreach ($artifact in @($zipOut, $msixOut)) {
+  $item = Get-Item -LiteralPath $artifact
+  $sizeMb = [math]::Round($item.Length / 1MB, 2)
+  Write-Host "$($item.Name): $sizeMb MB"
+  if ($sizeMb -gt $MaxArtifactSizeMb) {
+    throw "$($item.Name) is $sizeMb MB, exceeding the configured $MaxArtifactSizeMb MB artifact size limit."
+  }
+}
