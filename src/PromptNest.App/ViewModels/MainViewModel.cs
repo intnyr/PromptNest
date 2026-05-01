@@ -17,6 +17,8 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     private readonly IJumpListService? jumpListService;
     private readonly ISettingsRepository? settingsRepository;
     private readonly IUpdateService? updateService;
+    private readonly IImportExportService? importExportService;
+    private readonly IBackupService? backupService;
     private IReadOnlyList<Folder> serviceFolders = [];
     private Dictionary<string, Prompt> promptSnapshots = [];
     private CancellationTokenSource? searchRefreshCancellation;
@@ -33,7 +35,9 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         IPromptCopyService promptCopyService,
         IJumpListService jumpListService,
         ISettingsRepository settingsRepository,
-        IUpdateService updateService)
+        IUpdateService updateService,
+        IImportExportService? importExportService = null,
+        IBackupService? backupService = null)
     {
         this.promptService = promptService;
         this.folderService = folderService;
@@ -43,6 +47,8 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         this.jumpListService = jumpListService;
         this.settingsRepository = settingsRepository;
         this.updateService = updateService;
+        this.importExportService = importExportService;
+        this.backupService = backupService;
         library = LibraryDesignData.Create() with { IsPromptListLoading = true };
     }
 
@@ -51,6 +57,9 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
 
     [ObservableProperty]
     private string updateStatusText = "Update status unavailable";
+
+    [ObservableProperty]
+    private string dataManagementStatusText = "Import, export, and backup are available";
 
     [ObservableProperty]
     private string updateChannelText = "Stable";
@@ -94,6 +103,79 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         UpdateStatusText = result.Succeeded && result.Value is not null
             ? FormatUpdateStatus(result.Value)
             : result.Message ?? "Update check failed";
+    }
+
+    public async Task<OperationResult<ImportPlan>> PreviewImportAsync(
+        PromptNestExport exportData,
+        ImportOptions options,
+        CancellationToken cancellationToken)
+    {
+        if (importExportService is null)
+        {
+            DataManagementStatusText = "Import is unavailable";
+            return OperationResultFactory.Failure<ImportPlan>("ImportUnavailable", "Import service is unavailable.");
+        }
+
+        OperationResult<ImportPlan> result = await importExportService.PreviewImportAsync(exportData, options, cancellationToken);
+        DataManagementStatusText = result.Succeeded && result.Value is not null
+            ? FormatImportSummary(result.Value.Summary)
+            : result.Message ?? "Import validation failed";
+        return result;
+    }
+
+    public async Task<OperationResult<ImportSummary>> ImportAsync(
+        PromptNestExport exportData,
+        ImportOptions options,
+        CancellationToken cancellationToken)
+    {
+        if (importExportService is null)
+        {
+            DataManagementStatusText = "Import is unavailable";
+            return OperationResultFactory.Failure<ImportSummary>("ImportUnavailable", "Import service is unavailable.");
+        }
+
+        OperationResult<ImportSummary> result = await importExportService.ImportAsync(exportData, options, cancellationToken);
+        DataManagementStatusText = result.Succeeded && result.Value is not null
+            ? FormatImportSummary(result.Value)
+            : result.Message ?? "Import failed";
+
+        if (result.Succeeded)
+        {
+            serviceFolders = folderService is null ? serviceFolders : await folderService.ListAsync(cancellationToken);
+            await RefreshPromptListAsync(cancellationToken);
+        }
+
+        return result;
+    }
+
+    public async Task<OperationResult<PromptNestExport>> ExportPromptsAsync(CancellationToken cancellationToken)
+    {
+        if (importExportService is null)
+        {
+            DataManagementStatusText = "Export is unavailable";
+            return OperationResultFactory.Failure<PromptNestExport>("ExportUnavailable", "Export service is unavailable.");
+        }
+
+        OperationResult<PromptNestExport> result = await importExportService.ExportAsync(cancellationToken);
+        DataManagementStatusText = result.Succeeded && result.Value is not null
+            ? $"Export prepared with {result.Value.Prompts.Count} prompts"
+            : result.Message ?? "Export failed";
+        return result;
+    }
+
+    public async Task<OperationResult<BackupMetadata>> CreateBackupAsync(CancellationToken cancellationToken)
+    {
+        if (backupService is null)
+        {
+            DataManagementStatusText = "Backup is unavailable";
+            return OperationResultFactory.Failure<BackupMetadata>("BackupUnavailable", "Backup service is unavailable.");
+        }
+
+        OperationResult<BackupMetadata> result = await backupService.CreateBackupAsync(cancellationToken);
+        DataManagementStatusText = result.Succeeded && result.Value is not null
+            ? $"Backup created at {result.Value.CreatedAt.LocalDateTime:g}"
+            : result.Message ?? "Backup failed";
+        return result;
     }
 
     public async Task ApplyDeepLinkAsync(DeepLinkRequest request, CancellationToken cancellationToken)
@@ -196,6 +278,11 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
 
         return $"{status.Message}{version}{checkedAt}";
     }
+
+    private static string FormatImportSummary(ImportSummary summary) =>
+        summary.DryRun
+            ? $"Dry run: {summary.PromptsCreated} create, {summary.PromptsUpdated} update, {summary.PromptsSkipped} skip"
+            : $"Import complete: {summary.PromptsCreated} created, {summary.PromptsUpdated} updated, {summary.PromptsSkipped} skipped";
 
     private void QueueRefresh()
     {

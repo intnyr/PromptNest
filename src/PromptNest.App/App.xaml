@@ -12,6 +12,23 @@
                 <ResourceDictionary Source="ms-appx:///Styles/Typography.xaml" />
                 <ResourceDictionary Source="ms-appx:///Styles/Layout.xaml" />
                 <ResourceDictionary Source="ms-appx:///Styles/ControlStyles.xaml" />
+                <ResourceDictionary>
+                    <ResourceDictionary.ThemeDictionaries>
+                        <ResourceDictionary x:Key="Default">
+                            <SolidColorBrush x:Key="FocusVisualPrimaryBrush" Color="{StaticResource PromptNestColorFocusStroke}" />
+                            <SolidColorBrush x:Key="FocusVisualSecondaryBrush" Color="{StaticResource PromptNestColorFocusStrokeOuter}" />
+                            <SolidColorBrush x:Key="TextControlPlaceholderForeground" Color="{StaticResource PromptNestColorPlaceholder}" />
+                            <SolidColorBrush x:Key="TextControlPlaceholderForegroundPointerOver" Color="{StaticResource PromptNestColorPlaceholder}" />
+                            <SolidColorBrush x:Key="TextControlPlaceholderForegroundFocused" Color="{StaticResource PromptNestColorPlaceholder}" />
+                            <Thickness x:Key="FocusVisualPrimaryThickness">2</Thickness>
+                            <Thickness x:Key="FocusVisualSecondaryThickness">1</Thickness>
+                        </ResourceDictionary>
+                        <ResourceDictionary x:Key="HighContrast">
+                            <SolidColorBrush x:Key="FocusVisualPrimaryBrush" Color="{ThemeResource SystemColorHighlightColor}" />
+                            <SolidColorBrush x:Key="FocusVisualSecondaryBrush" Color="{ThemeResource SystemColorWindowColor}" />
+                        </ResourceDictionary>
+                    </ResourceDictionary.ThemeDictionaries>
+                </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
             <converters:BooleanToBrushConverter x:Key="BooleanToBrushConverter" />
             <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />

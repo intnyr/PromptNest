@@ -11,9 +11,10 @@
     <Color x:Key="PromptNestColorBorderMuted">#FF2C313B</Color>
     <Color x:Key="PromptNestColorBorderStrong">#FF3A4150</Color>
     <Color x:Key="PromptNestColorTextPrimary">#FFF5F7FB</Color>
-    <Color x:Key="PromptNestColorTextSecondary">#FFC8CEDA</Color>
-    <Color x:Key="PromptNestColorTextTertiary">#FF969DAA</Color>
-    <Color x:Key="PromptNestColorTextDisabled">#FF6D7481</Color>
+    <Color x:Key="PromptNestColorTextSecondary">#FFD6DBE5</Color>
+    <Color x:Key="PromptNestColorTextTertiary">#FFB0B6C2</Color>
+    <Color x:Key="PromptNestColorTextDisabled">#FF7A8190</Color>
+    <Color x:Key="PromptNestColorPlaceholder">#FFA8AEBA</Color>
     <Color x:Key="PromptNestColorIconDefault">#FFC2C8D4</Color>
     <Color x:Key="PromptNestColorIconMuted">#FF929AA8</Color>
     <Color x:Key="PromptNestColorIconSelected">#FFFFFFFF</Color>
@@ -24,7 +25,8 @@
     <Color x:Key="PromptNestColorSelectedRow">#FF27304F</Color>
     <Color x:Key="PromptNestColorSelectedRowHover">#FF303A60</Color>
     <Color x:Key="PromptNestColorRowHover">#1FFFFFFF</Color>
-    <Color x:Key="PromptNestColorFocusStroke">#FF7B86FF</Color>
+    <Color x:Key="PromptNestColorFocusStroke">#FF8A95FF</Color>
+    <Color x:Key="PromptNestColorFocusStrokeOuter">#FF0A0E18</Color>
     <Color x:Key="PromptNestColorSuccess">#FF7ED957</Color>
     <Color x:Key="PromptNestColorWarning">#FFF7C948</Color>
     <Color x:Key="PromptNestColorDanger">#FFFF6B6B</Color>
@@ -48,6 +50,7 @@
     <SolidColorBrush x:Key="PromptNestTextSecondaryBrush" Color="{StaticResource PromptNestColorTextSecondary}" />
     <SolidColorBrush x:Key="PromptNestTextTertiaryBrush" Color="{StaticResource PromptNestColorTextTertiary}" />
     <SolidColorBrush x:Key="PromptNestTextDisabledBrush" Color="{StaticResource PromptNestColorTextDisabled}" />
+    <SolidColorBrush x:Key="PromptNestPlaceholderBrush" Color="{StaticResource PromptNestColorPlaceholder}" />
     <SolidColorBrush x:Key="PromptNestIconDefaultBrush" Color="{StaticResource PromptNestColorIconDefault}" />
     <SolidColorBrush x:Key="PromptNestIconMutedBrush" Color="{StaticResource PromptNestColorIconMuted}" />
     <SolidColorBrush x:Key="PromptNestIconSelectedBrush" Color="{StaticResource PromptNestColorIconSelected}" />
@@ -59,6 +62,7 @@
     <SolidColorBrush x:Key="PromptNestSelectedRowHoverBrush" Color="{StaticResource PromptNestColorSelectedRowHover}" />
     <SolidColorBrush x:Key="PromptNestRowHoverBrush" Color="{StaticResource PromptNestColorRowHover}" />
     <SolidColorBrush x:Key="PromptNestFocusStrokeBrush" Color="{StaticResource PromptNestColorFocusStroke}" />
+    <SolidColorBrush x:Key="PromptNestFocusStrokeOuterBrush" Color="{StaticResource PromptNestColorFocusStrokeOuter}" />
     <SolidColorBrush x:Key="PromptNestSuccessBrush" Color="{StaticResource PromptNestColorSuccess}" />
     <SolidColorBrush x:Key="PromptNestWarningBrush" Color="{StaticResource PromptNestColorWarning}" />
     <SolidColorBrush x:Key="PromptNestDangerBrush" Color="{StaticResource PromptNestColorDanger}" />

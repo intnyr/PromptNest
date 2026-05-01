@@ -1,3 +1,5 @@
+using System.Text.Json;
+
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
@@ -6,11 +8,18 @@ using Microsoft.UI.Xaml.Media;
 using PromptNest.App.ViewModels;
 using PromptNest.Core.Abstractions;
 using PromptNest.Core.Models;
+using Windows.Storage;
+using Windows.Storage.Pickers;
 
 namespace PromptNest.App.Views;
 
 public sealed partial class MainWindow : Window
 {
+    private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web)
+    {
+        WriteIndented = true
+    };
+
     private readonly DispatcherTimer searchDebounceTimer = new() { Interval = TimeSpan.FromMilliseconds(250) };
 
     public MainWindow(MainViewModel viewModel, ITrayService trayService)
@@ -179,6 +188,106 @@ public sealed partial class MainWindow : Window
         await ViewModel.CheckForUpdatesAsync(CancellationToken.None);
     }
 
+    private async void OnImportPromptsClick(object sender, RoutedEventArgs args)
+    {
+        ArgumentNullException.ThrowIfNull(sender);
+        ArgumentNullException.ThrowIfNull(args);
+
+        FileOpenPicker picker = CreateOpenPicker();
+        StorageFile? file = await picker.PickSingleFileAsync();
+        if (file is null)
+        {
+            return;
+        }
+
+        PromptNestExport? exportData;
+        try
+        {
+            string json = await FileIO.ReadTextAsync(file);
+            exportData = JsonSerializer.Deserialize<PromptNestExport>(json, JsonOptions);
+        }
+        catch (Exception ex) when (ex is IOException or JsonException or UnauthorizedAccessException)
+        {
+            await ShowMessageDialogAsync("Import failed", "The selected file could not be read as PromptNest JSON.");
+            return;
+        }
+
+        if (exportData is null)
+        {
+            await ShowMessageDialogAsync("Import failed", "The selected file did not contain PromptNest export data.");
+            return;
+        }
+
+        OperationResult<ImportPlan> preview = await ViewModel.PreviewImportAsync(
+            exportData,
+            new ImportOptions { ConflictMode = ImportConflictMode.Skip, DryRun = true },
+            CancellationToken.None);
+        if (!preview.Succeeded || preview.Value is null || preview.Value.HasErrors)
+        {
+            string details = preview.Value is null
+                ? preview.Message ?? "Import validation failed."
+                : string.Join(Environment.NewLine, preview.Value.Issues.Where(issue => issue.Severity == ImportValidationSeverity.Error).Take(5).Select(issue => $"{issue.Code}: {issue.Message}"));
+            await ShowMessageDialogAsync("Import validation failed", details);
+            return;
+        }
+
+        ImportConflictMode? conflictMode = await ShowImportOptionsDialogAsync(preview.Value.Summary);
+        if (conflictMode is null)
+        {
+            return;
+        }
+
+        OperationResult<BackupMetadata> backup = await ViewModel.CreateBackupAsync(CancellationToken.None);
+        if (!backup.Succeeded)
+        {
+            await ShowMessageDialogAsync("Backup failed", backup.Message ?? "A backup could not be created before import.");
+            return;
+        }
+
+        OperationResult<ImportSummary> result = await ViewModel.ImportAsync(
+            exportData,
+            new ImportOptions { ConflictMode = conflictMode.Value },
+            CancellationToken.None);
+        await ShowMessageDialogAsync(
+            result.Succeeded ? "Import complete" : "Import failed",
+            result.Value is null ? result.Message ?? "Import failed." : FormatImportDialogSummary(result.Value));
+    }
+
+    private async void OnExportPromptsClick(object sender, RoutedEventArgs args)
+    {
+        ArgumentNullException.ThrowIfNull(sender);
+        ArgumentNullException.ThrowIfNull(args);
+
+        OperationResult<PromptNestExport> export = await ViewModel.ExportPromptsAsync(CancellationToken.None);
+        if (!export.Succeeded || export.Value is null)
+        {
+            await ShowMessageDialogAsync("Export failed", export.Message ?? "PromptNest could not prepare the export.");
+            return;
+        }
+
+        FileSavePicker picker = CreateSavePicker();
+        StorageFile? file = await picker.PickSaveFileAsync();
+        if (file is null)
+        {
+            return;
+        }
+
+        string json = JsonSerializer.Serialize(export.Value, JsonOptions);
+        await FileIO.WriteTextAsync(file, json);
+        await ShowMessageDialogAsync("Export complete", $"Exported {export.Value.Prompts.Count} prompts.");
+    }
+
+    private async void OnCreateBackupClick(object sender, RoutedEventArgs args)
+    {
+        ArgumentNullException.ThrowIfNull(sender);
+        ArgumentNullException.ThrowIfNull(args);
+
+        OperationResult<BackupMetadata> result = await ViewModel.CreateBackupAsync(CancellationToken.None);
+        await ShowMessageDialogAsync(
+            result.Succeeded ? "Backup created" : "Backup failed",
+            result.Value is null ? result.Message ?? "Backup failed." : result.Value.FilePath);
+    }
+
     private void OnEditorFieldChanged(object sender, TextChangedEventArgs args)
     {
         ArgumentNullException.ThrowIfNull(sender);
@@ -308,6 +417,13 @@ public sealed partial class MainWindow : Window
         ArgumentNullException.ThrowIfNull(sender);
         if (!IsControlKeyDown())
         {
+            if (args.Key == Windows.System.VirtualKey.Escape && SettingsPane.Visibility == Visibility.Visible)
+            {
+                SettingsPane.Visibility = Visibility.Collapsed;
+                args.Handled = true;
+                return;
+            }
+
             if (args.Key == Windows.System.VirtualKey.F2)
             {
                 TitleBox.Focus(FocusState.Programmatic);
@@ -340,6 +456,13 @@ public sealed partial class MainWindow : Window
                 break;
             case Windows.System.VirtualKey.E:
                 PromptBodyEditor.Focus(FocusState.Programmatic);
+                args.Handled = true;
+                break;
+            case Windows.System.VirtualKey.S:
+                if (ViewModel.Library.CanSave)
+                {
+                    ViewModel.SaveEditorCommand.Execute(null);
+                }
                 args.Handled = true;
                 break;
             case (Windows.System.VirtualKey)188:
@@ -448,6 +571,100 @@ public sealed partial class MainWindow : Window
         TagInput.Text = string.Empty;
         TagInput.Focus(FocusState.Programmatic);
     }
+
+    private FileOpenPicker CreateOpenPicker()
+    {
+        var picker = new FileOpenPicker();
+        picker.FileTypeFilter.Add(".json");
+        InitializePicker(picker);
+        return picker;
+    }
+
+    private FileSavePicker CreateSavePicker()
+    {
+        var picker = new FileSavePicker
+        {
+            SuggestedFileName = "promptnest-export"
+        };
+        picker.FileTypeChoices.Add("PromptNest JSON", [".json"]);
+        picker.DefaultFileExtension = ".json";
+        InitializePicker(picker);
+        return picker;
+    }
+
+    private void InitializePicker(object picker)
+    {
+        nint handle = WinRT.Interop.WindowNative.GetWindowHandle(this);
+        WinRT.Interop.InitializeWithWindow.Initialize(picker, handle);
+    }
+
+    private async Task<ImportConflictMode?> ShowImportOptionsDialogAsync(ImportSummary summary)
+    {
+        var conflictModeBox = new ComboBox
+        {
+            Header = "Conflict mode",
+            SelectedIndex = 0
+        };
+        conflictModeBox.Items.Add("Skip existing prompts");
+        conflictModeBox.Items.Add("Overwrite existing prompts");
+        conflictModeBox.Items.Add("Duplicate existing prompts");
+
+        var panel = new StackPanel { Spacing = 12 };
+        panel.Children.Add(new TextBlock
+        {
+            Text = FormatImportDialogSummary(summary),
+            TextWrapping = TextWrapping.Wrap
+        });
+        panel.Children.Add(conflictModeBox);
+
+        var dialog = new ContentDialog
+        {
+            XamlRoot = ShellRoot.XamlRoot,
+            Title = "Import prompts",
+            Content = panel,
+            PrimaryButtonText = "Import",
+            CloseButtonText = "Cancel",
+            DefaultButton = ContentDialogButton.Primary
+        };
+
+        ContentDialogResult result = await dialog.ShowAsync();
+        if (result != ContentDialogResult.Primary)
+        {
+            return null;
+        }
+
+        return conflictModeBox.SelectedIndex switch
+        {
+            1 => ImportConflictMode.Overwrite,
+            2 => ImportConflictMode.Duplicate,
+            _ => ImportConflictMode.Skip
+        };
+    }
+
+    private async Task ShowMessageDialogAsync(string title, string message)
+    {
+        var dialog = new ContentDialog
+        {
+            XamlRoot = ShellRoot.XamlRoot,
+            Title = title,
+            Content = new TextBlock
+            {
+                Text = message,
+                TextWrapping = TextWrapping.Wrap
+            },
+            CloseButtonText = "OK"
+        };
+
+        await dialog.ShowAsync();
+    }
+
+    private static string FormatImportDialogSummary(ImportSummary summary) =>
+        $"Prompts created: {summary.PromptsCreated}{Environment.NewLine}" +
+        $"Prompts updated: {summary.PromptsUpdated}{Environment.NewLine}" +
+        $"Prompts skipped: {summary.PromptsSkipped}{Environment.NewLine}" +
+        $"Folders created: {summary.FoldersCreated}{Environment.NewLine}" +
+        $"Tags created: {summary.TagsCreated}{Environment.NewLine}" +
+        $"Validation warnings: {summary.ValidationWarnings}";
 
     private async Task<IReadOnlyDictionary<string, string>?> ShowVariableFillDialogAsync(PromptCopyForm form)
     {

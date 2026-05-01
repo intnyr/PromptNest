@@ -66,6 +66,11 @@ public interface IImportExportService
 {
     Task<OperationResult<PromptNestExport>> ExportAsync(CancellationToken cancellationToken);
 
+    Task<OperationResult<ImportPlan>> PreviewImportAsync(
+        PromptNestExport exportData,
+        ImportOptions options,
+        CancellationToken cancellationToken);
+
     Task<OperationResult<ImportSummary>> ImportAsync(
         PromptNestExport exportData,
         ImportOptions options,
@@ -79,4 +84,21 @@ public interface IBackupService
     Task<IReadOnlyList<BackupMetadata>> ListBackupsAsync(CancellationToken cancellationToken);
 
     Task<OperationResult> ApplyRetentionAsync(int keepLast, CancellationToken cancellationToken);
+}
+
+public interface IRepositoryPromptScanner
+{
+    Task<RepositoryPromptScanResult> ScanAsync(RepositoryPromptScanRequest request, CancellationToken cancellationToken);
+}
+
+public interface IRepositoryPromptImportNormalizer
+{
+    RepositoryPromptImportDocument Normalize(
+        IReadOnlyList<RepositoryPromptCandidate> candidates,
+        RepositoryPromptNormalizeOptions options);
+}
+
+public interface ILinearBatchReportFormatter
+{
+    LinearBatchReportResult Format(LinearBatchReportRequest request);
 }

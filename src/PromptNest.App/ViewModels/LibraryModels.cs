@@ -138,6 +138,8 @@ public sealed record TagChipViewModel
     public int? Count { get; init; }
 
     public bool IsRemovable { get; init; }
+
+    public string RemoveAccessibleName => $"Remove tag {Name}";
 }
 
 public sealed record PromptListItemViewModel
@@ -159,6 +161,10 @@ public sealed record PromptListItemViewModel
     public string DateText => Date.ToString("MMM d, yyyy", CultureInfo.InvariantCulture);
 
     public string FavoriteGlyph => IsFavorite ? "\uE735" : "\uE734";
+
+    public string FavoriteAccessibleName => IsFavorite
+        ? $"Remove {Title} from favorites"
+        : $"Add {Title} to favorites";
 }
 
 public sealed record PromptDetailViewModel

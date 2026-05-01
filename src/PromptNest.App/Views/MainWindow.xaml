@@ -56,31 +56,12 @@
                 Foreground="{StaticResource PromptNestTextPrimaryBrush}"
                 Text="PromptNest" />
 
+            <!-- Drag region only; system caption controls are rendered by the host. -->
             <Grid
                 Grid.Column="2"
                 Width="138"
-                IsHitTestVisible="False">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                </Grid.ColumnDefinitions>
-                <FontIcon
-                    Grid.Column="0"
-                    FontSize="12"
-                    Foreground="{StaticResource PromptNestIconDefaultBrush}"
-                    Glyph="&#xE921;" />
-                <FontIcon
-                    Grid.Column="1"
-                    FontSize="12"
-                    Foreground="{StaticResource PromptNestIconDefaultBrush}"
-                    Glyph="&#xE922;" />
-                <FontIcon
-                    Grid.Column="2"
-                    FontSize="12"
-                    Foreground="{StaticResource PromptNestIconDefaultBrush}"
-                    Glyph="&#xE8BB;" />
-            </Grid>
+                AutomationProperties.AccessibilityView="Raw"
+                IsHitTestVisible="False" />
         </Grid>
 
         <Grid Grid.Row="1">
@@ -122,13 +103,14 @@
             <Grid
                 Grid.Column="0"
                 HorizontalAlignment="Center"
-                Margin="0,12,0,0"
+                Margin="0,12,0,12"
                 RowSpacing="12">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
@@ -139,7 +121,8 @@
                     AutomationProperties.Name="Prompt library"
                     Background="{StaticResource PromptNestSelectedRowBrush}"
                     BorderBrush="Transparent"
-                    CornerRadius="{StaticResource PromptNestControlRadius}">
+                    CornerRadius="{StaticResource PromptNestControlRadius}"
+                    ToolTipService.ToolTip="Prompt library">
                     <FontIcon
                         Foreground="{StaticResource PromptNestAccentBrush}"
                         Glyph="&#xE8A5;" />
@@ -151,7 +134,8 @@
                     AutomationProperties.Name="Tags"
                     Background="Transparent"
                     BorderBrush="Transparent"
-                    CornerRadius="{StaticResource PromptNestControlRadius}">
+                    CornerRadius="{StaticResource PromptNestControlRadius}"
+                    ToolTipService.ToolTip="Tags">
                     <FontIcon
                         Foreground="{StaticResource PromptNestIconMutedBrush}"
                         Glyph="&#xE8EC;" />
@@ -163,46 +147,48 @@
                     AutomationProperties.Name="Run prompt"
                     Background="Transparent"
                     BorderBrush="Transparent"
-                    CornerRadius="{StaticResource PromptNestControlRadius}">
+                    CornerRadius="{StaticResource PromptNestControlRadius}"
+                    ToolTipService.ToolTip="Run prompt">
                     <FontIcon
                         Foreground="{StaticResource PromptNestIconMutedBrush}"
                         Glyph="&#xE8B7;" />
                 </Button>
                 <Button
-                    Grid.Row="3"
+                    Grid.Row="4"
                     Width="{StaticResource PromptNestRailButtonSize}"
                     Height="{StaticResource PromptNestRailButtonSize}"
-                    VerticalAlignment="Bottom"
                     AutomationProperties.Name="Settings"
                     Background="Transparent"
                     BorderBrush="Transparent"
                     Click="OnSettingsClick"
-                    CornerRadius="{StaticResource PromptNestControlRadius}">
+                    CornerRadius="{StaticResource PromptNestControlRadius}"
+                    ToolTipService.ToolTip="Settings (Ctrl+,)">
                     <FontIcon
                         Foreground="{StaticResource PromptNestIconMutedBrush}"
-                        Glyph="&#xE713;"
-                        ToolTipService.ToolTip="Settings" />
-                </Button>
-                <Button
-                    Grid.Row="4"
-                    Width="{StaticResource PromptNestRailButtonSize}"
-                    Height="{StaticResource PromptNestRailButtonSize}"
-                    AutomationProperties.Name="Help"
-                    Background="Transparent"
-                    BorderBrush="Transparent"
-                    CornerRadius="{StaticResource PromptNestControlRadius}">
-                    <FontIcon
-                        Foreground="{StaticResource PromptNestIconMutedBrush}"
-                        Glyph="&#xE897;" />
+                        Glyph="&#xE713;" />
                 </Button>
                 <Button
                     Grid.Row="5"
                     Width="{StaticResource PromptNestRailButtonSize}"
                     Height="{StaticResource PromptNestRailButtonSize}"
+                    AutomationProperties.Name="Help"
+                    Background="Transparent"
+                    BorderBrush="Transparent"
+                    CornerRadius="{StaticResource PromptNestControlRadius}"
+                    ToolTipService.ToolTip="Help">
+                    <FontIcon
+                        Foreground="{StaticResource PromptNestIconMutedBrush}"
+                        Glyph="&#xE897;" />
+                </Button>
+                <Button
+                    Grid.Row="6"
+                    Width="{StaticResource PromptNestRailButtonSize}"
+                    Height="{StaticResource PromptNestRailButtonSize}"
                     AutomationProperties.Name="Profile"
                     Background="Transparent"
                     BorderBrush="Transparent"
-                    CornerRadius="{StaticResource PromptNestControlRadius}">
+                    CornerRadius="{StaticResource PromptNestControlRadius}"
+                    ToolTipService.ToolTip="Profile">
                     <FontIcon
                         Foreground="{StaticResource PromptNestIconMutedBrush}"
                         Glyph="&#xE77B;" />
@@ -265,18 +251,18 @@
                     </Grid.ColumnDefinitions>
                     <TextBlock
                         VerticalAlignment="Center"
-                        FontSize="{StaticResource PromptNestFontSizeCaption}"
-                        Foreground="{StaticResource PromptNestTextTertiaryBrush}"
+                        Style="{StaticResource PromptNestSectionHeaderStyle}"
                         Text="FOLDERS" />
                     <Button
                         Grid.Column="1"
-                        Width="28"
-                        Height="28"
+                        Width="{StaticResource PromptNestSmallIconButtonSize}"
+                        Height="{StaticResource PromptNestSmallIconButtonSize}"
                         AutomationProperties.Name="Add folder"
                         Background="Transparent"
-                        BorderBrush="Transparent">
+                        BorderBrush="Transparent"
+                        ToolTipService.ToolTip="Add folder">
                         <FontIcon
-                            FontSize="12"
+                            FontSize="{StaticResource PromptNestIconGlyphSmall}"
                             Foreground="{StaticResource PromptNestIconMutedBrush}"
                             Glyph="&#xE710;" />
                     </Button>
@@ -300,15 +286,17 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <Button
-                                    Width="24"
-                                    Height="24"
+                                    Width="{StaticResource PromptNestFolderToggleSize}"
+                                    Height="{StaticResource PromptNestFolderToggleSize}"
+                                    Padding="0"
+                                    AutomationProperties.Name="Toggle folder"
                                     Background="Transparent"
                                     BorderBrush="Transparent"
                                     Click="OnFolderToggleClick"
                                     IsEnabled="{Binding HasChildren}"
                                     Tag="{Binding Id}">
                                     <FontIcon
-                                        FontSize="10"
+                                        FontSize="{StaticResource PromptNestIconGlyphSmall}"
                                         Foreground="{StaticResource PromptNestIconMutedBrush}"
                                         Glyph="{Binding IsExpanded, Converter={StaticResource FolderChevronGlyphConverter}}" />
                                 </Button>
@@ -338,8 +326,7 @@
                 <TextBlock
                     Grid.Row="3"
                     Margin="0,10,0,0"
-                    FontSize="{StaticResource PromptNestFontSizeCaption}"
-                    Foreground="{StaticResource PromptNestTextTertiaryBrush}"
+                    Style="{StaticResource PromptNestSectionHeaderStyle}"
                     Text="COLLECTIONS" />
 
                 <ListView
@@ -403,9 +390,11 @@
                         Margin="14,0,0,0"
                         HorizontalAlignment="Left"
                         VerticalAlignment="Center"
-                        FontSize="14"
+                        AutomationProperties.AccessibilityView="Raw"
+                        FontSize="{StaticResource PromptNestIconGlyphMedium}"
                         Foreground="{StaticResource PromptNestIconMutedBrush}"
-                        Glyph="&#xE721;" />
+                        Glyph="&#xE721;"
+                        IsHitTestVisible="False" />
                     <StackPanel
                         Margin="0,0,10,0"
                         HorizontalAlignment="Right"
@@ -413,24 +402,31 @@
                         Orientation="Horizontal"
                         Spacing="6">
                         <Button
-                            Width="54"
+                            MinWidth="54"
                             Height="24"
                             AutomationProperties.Name="Focus search"
+                            AutomationProperties.HelpText="Keyboard shortcut: Control plus K"
                             Background="{StaticResource PromptNestPaneElevatedBrush}"
                             BorderBrush="{StaticResource PromptNestBorderMutedBrush}"
                             Click="OnFocusSearchClick"
                             Content="Ctrl+K"
                             FontSize="{StaticResource PromptNestFontSizeCaption}"
-                            Padding="4,0" />
+                            Foreground="{StaticResource PromptNestTextSecondaryBrush}"
+                            Padding="6,0"
+                            ToolTipService.ToolTip="Focus search (Ctrl+K)" />
                         <Button
-                            Width="24"
-                            Height="24"
+                            Width="{StaticResource PromptNestMinTouchTarget}"
+                            Height="{StaticResource PromptNestMinTouchTarget}"
                             AutomationProperties.Name="Clear search"
                             Background="Transparent"
                             BorderBrush="Transparent"
                             Click="OnClearSearchClick"
-                            Padding="0">
-                            <FontIcon FontSize="10" Glyph="&#xE711;" />
+                            Padding="0"
+                            ToolTipService.ToolTip="Clear search (Esc)">
+                            <FontIcon
+                                FontSize="{StaticResource PromptNestIconGlyphSmall}"
+                                Foreground="{StaticResource PromptNestIconDefaultBrush}"
+                                Glyph="&#xE711;" />
                         </Button>
                     </StackPanel>
                 </Grid>
@@ -445,43 +441,53 @@
                     </Grid.ColumnDefinitions>
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <Button
+                            AccessKey="N"
                             AutomationProperties.AutomationId="PromptNest.NewPromptButton"
-                            Content="New"
+                            AutomationProperties.Name="New prompt"
                             Click="OnNewPromptClick"
+                            Content="New"
                             MinWidth="72"
                             Height="{StaticResource PromptNestIconButtonSize}"
                             Background="{StaticResource PromptNestAccentBrush}"
                             BorderBrush="Transparent"
                             CornerRadius="{StaticResource PromptNestControlRadius}"
-                            Foreground="{StaticResource PromptNestIconSelectedBrush}" />
+                            Foreground="{StaticResource PromptNestIconSelectedBrush}"
+                            ToolTipService.ToolTip="New prompt (Ctrl+N)" />
                         <Button
+                            AccessKey="D"
                             AutomationProperties.AutomationId="PromptNest.DuplicatePromptButton"
-                            Content="Duplicate"
+                            AutomationProperties.Name="Duplicate selected prompt"
                             Click="OnDuplicateClick"
+                            Content="Duplicate"
                             Height="{StaticResource PromptNestIconButtonSize}"
                             Padding="10,0"
                             Background="Transparent"
                             BorderBrush="Transparent"
                             CornerRadius="{StaticResource PromptNestControlRadius}"
-                            Foreground="{StaticResource PromptNestTextPrimaryBrush}" />
+                            Foreground="{StaticResource PromptNestTextPrimaryBrush}"
+                            ToolTipService.ToolTip="Duplicate (Ctrl+D)" />
                         <Button
-                            Content="Folder"
+                            AutomationProperties.Name="New folder"
                             Click="OnNewFolderClick"
+                            Content="Folder"
                             Height="{StaticResource PromptNestIconButtonSize}"
                             Padding="10,0"
                             Background="Transparent"
                             BorderBrush="Transparent"
                             CornerRadius="{StaticResource PromptNestControlRadius}"
-                            Foreground="{StaticResource PromptNestTextPrimaryBrush}" />
+                            Foreground="{StaticResource PromptNestTextPrimaryBrush}"
+                            ToolTipService.ToolTip="New folder" />
                         <Button
-                            Content="Tags"
+                            AutomationProperties.Name="Manage tags"
                             Click="OnManageTagsClick"
+                            Content="Tags"
                             Height="{StaticResource PromptNestIconButtonSize}"
                             Padding="10,0"
                             Background="Transparent"
                             BorderBrush="Transparent"
                             CornerRadius="{StaticResource PromptNestControlRadius}"
-                            Foreground="{StaticResource PromptNestTextPrimaryBrush}" />
+                            Foreground="{StaticResource PromptNestTextPrimaryBrush}"
+                            ToolTipService.ToolTip="Manage tags" />
                         <Button
                             Width="{StaticResource PromptNestIconButtonSize}"
                             Height="{StaticResource PromptNestIconButtonSize}"
@@ -489,9 +495,10 @@
                             Background="Transparent"
                             BorderBrush="Transparent"
                             Click="OnFilterClick"
-                            CornerRadius="{StaticResource PromptNestControlRadius}">
+                            CornerRadius="{StaticResource PromptNestControlRadius}"
+                            ToolTipService.ToolTip="Filters">
                             <FontIcon
-                                FontSize="14"
+                                FontSize="{StaticResource PromptNestIconGlyphMedium}"
                                 Foreground="{StaticResource PromptNestIconDefaultBrush}"
                                 Glyph="&#xE71C;" />
                         </Button>
@@ -502,9 +509,10 @@
                             Background="Transparent"
                             BorderBrush="Transparent"
                             Click="OnOverflowClick"
-                            CornerRadius="{StaticResource PromptNestControlRadius}">
+                            CornerRadius="{StaticResource PromptNestControlRadius}"
+                            ToolTipService.ToolTip="More actions">
                             <FontIcon
-                                FontSize="14"
+                                FontSize="{StaticResource PromptNestIconGlyphMedium}"
                                 Foreground="{StaticResource PromptNestIconDefaultBrush}"
                                 Glyph="&#xE712;" />
                         </Button>
@@ -515,23 +523,24 @@
                         Grid.Column="1"
                         HorizontalAlignment="Right"
                         VerticalAlignment="Center"
+                        Padding="8,0"
+                        AutomationProperties.Name="Sort order"
                         Background="Transparent"
                         BorderBrush="Transparent"
                         Click="OnSortClick"
                         Content="Sort: Relevance"
-                        Foreground="{StaticResource PromptNestTextSecondaryBrush}" />
+                        Foreground="{StaticResource PromptNestTextSecondaryBrush}"
+                        ToolTipService.ToolTip="Cycle sort order" />
                 </Grid>
 
                 <Grid
                     Grid.Row="2"
                     Margin="0,0,0,6">
                     <TextBlock
+                        AutomationProperties.LiveSetting="Polite"
+                        FontSize="{StaticResource PromptNestFontSizeBodySmall}"
                         Foreground="{StaticResource PromptNestTextSecondaryBrush}"
                         Text="{Binding Library.Pagination.ResultCountText}" />
-                    <TextBlock
-                        HorizontalAlignment="Right"
-                        Foreground="{StaticResource PromptNestTextSecondaryBrush}"
-                        Text="{Binding Library.Pagination.RangeText}" />
                 </Grid>
 
                 <ListView
@@ -576,16 +585,18 @@
                                             Text="{Binding DateText}" />
                                         <Button
                                             Grid.Column="2"
-                                            Width="28"
-                                            Height="28"
-                                            AutomationProperties.Name="Toggle favorite"
+                                            Width="{StaticResource PromptNestSmallIconButtonSize}"
+                                            Height="{StaticResource PromptNestSmallIconButtonSize}"
+                                            AutomationProperties.Name="{Binding FavoriteAccessibleName}"
                                             Background="Transparent"
                                             BorderBrush="Transparent"
                                             Click="OnFavoriteClick"
+                                            CornerRadius="{StaticResource PromptNestControlRadius}"
                                             Padding="0"
-                                            Tag="{Binding Id}">
+                                            Tag="{Binding Id}"
+                                            ToolTipService.ToolTip="{Binding FavoriteAccessibleName}">
                                             <FontIcon
-                                                FontSize="15"
+                                                FontSize="{StaticResource PromptNestIconGlyphLarge}"
                                                 Foreground="{StaticResource PromptNestWarningBrush}"
                                                 Glyph="{Binding FavoriteGlyph}" />
                                         </Button>
@@ -637,30 +648,42 @@
                     <StackPanel
                         HorizontalAlignment="Left"
                         Orientation="Horizontal"
-                        Spacing="4">
+                        Spacing="6">
                         <Button
-                            Width="28"
-                            Height="28"
+                            Width="{StaticResource PromptNestPaginationButtonSize}"
+                            Height="{StaticResource PromptNestPaginationButtonSize}"
                             AutomationProperties.Name="Previous page"
                             Click="OnPreviousPageClick"
-                            Content="‹" />
+                            Content="‹"
+                            CornerRadius="{StaticResource PromptNestControlRadius}"
+                            Padding="0"
+                            ToolTipService.ToolTip="Previous page" />
                         <Button
-                            Width="28"
-                            Height="28"
+                            Width="{StaticResource PromptNestPaginationButtonSize}"
+                            Height="{StaticResource PromptNestPaginationButtonSize}"
+                            AutomationProperties.Name="Current page"
                             Background="{StaticResource PromptNestAccentBrush}"
                             BorderBrush="Transparent"
                             Content="{Binding Library.Pagination.PageNumber}"
-                            Foreground="{StaticResource PromptNestIconSelectedBrush}" />
+                            CornerRadius="{StaticResource PromptNestControlRadius}"
+                            Foreground="{StaticResource PromptNestIconSelectedBrush}"
+                            IsHitTestVisible="False"
+                            Padding="0" />
                         <Button
-                            Width="28"
-                            Height="28"
+                            Width="{StaticResource PromptNestPaginationButtonSize}"
+                            Height="{StaticResource PromptNestPaginationButtonSize}"
                             AutomationProperties.Name="Next page"
                             Click="OnNextPageClick"
-                            Content="›" />
+                            Content="›"
+                            CornerRadius="{StaticResource PromptNestControlRadius}"
+                            Padding="0"
+                            ToolTipService.ToolTip="Next page" />
                     </StackPanel>
                     <TextBlock
                         HorizontalAlignment="Right"
                         VerticalAlignment="Center"
+                        AutomationProperties.LiveSetting="Polite"
+                        FontSize="{StaticResource PromptNestFontSizeBodySmall}"
                         Foreground="{StaticResource PromptNestTextSecondaryBrush}"
                         Text="{Binding Library.Pagination.RangeText}" />
                 </Grid>
@@ -669,8 +692,10 @@
             <Border
                 x:Name="SettingsPane"
                 Grid.Column="3"
-                Width="520"
+                MinWidth="420"
+                MaxWidth="560"
                 HorizontalAlignment="Right"
+                AutomationProperties.Name="Settings panel"
                 Background="{StaticResource PromptNestEditorBrush}"
                 BorderBrush="{StaticResource PromptNestBorderMutedBrush}"
                 BorderThickness="1,0,0,0"
@@ -683,25 +708,32 @@
                     </Grid.RowDefinitions>
                     <Grid>
                         <TextBlock
+                            AutomationProperties.HeadingLevel="Level1"
                             FontSize="{StaticResource PromptNestFontSizeTitle}"
                             FontWeight="SemiBold"
                             Foreground="{StaticResource PromptNestTextPrimaryBrush}"
                             Text="Settings" />
                         <Button
-                            Width="32"
-                            Height="32"
+                            Width="{StaticResource PromptNestIconButtonSize}"
+                            Height="{StaticResource PromptNestIconButtonSize}"
                             HorizontalAlignment="Right"
                             AutomationProperties.Name="Close settings"
                             Background="Transparent"
                             BorderBrush="Transparent"
-                            Click="OnCloseSettingsClick">
-                        <FontIcon FontSize="12" Glyph="&#xE711;" />
+                            Click="OnCloseSettingsClick"
+                            CornerRadius="{StaticResource PromptNestControlRadius}"
+                            Padding="0"
+                            ToolTipService.ToolTip="Close settings (Esc)">
+                            <FontIcon
+                                FontSize="{StaticResource PromptNestIconGlyphSmall}"
+                                Foreground="{StaticResource PromptNestIconDefaultBrush}"
+                                Glyph="&#xE711;" />
                         </Button>
                     </Grid>
                     <ScrollViewer Grid.Row="1">
                         <StackPanel Spacing="16">
                             <StackPanel Spacing="8">
-                                <TextBlock Foreground="{StaticResource PromptNestTextPrimaryBrush}" Text="Appearance" />
+                                <TextBlock AutomationProperties.HeadingLevel="Level2" Style="{StaticResource PromptNestFieldLabelStyle}" Text="Appearance" />
                                 <ComboBox SelectedIndex="0">
                                     <ComboBoxItem Content="System dark" />
                                     <ComboBoxItem Content="Dark" />
@@ -709,35 +741,42 @@
                                 </ComboBox>
                             </StackPanel>
                             <StackPanel Spacing="8">
-                                <TextBlock Foreground="{StaticResource PromptNestTextPrimaryBrush}" Text="Global hotkey" />
+                                <TextBlock AutomationProperties.HeadingLevel="Level2" Style="{StaticResource PromptNestFieldLabelStyle}" Text="Global hotkey" />
                                 <TextBox
                                     IsReadOnly="True"
                                     Style="{StaticResource PromptNestSearchBoxStyle}"
                                     Text="Win+Shift+Space" />
                             </StackPanel>
                             <StackPanel Spacing="8">
-                                <TextBlock Foreground="{StaticResource PromptNestTextPrimaryBrush}" Text="Data management" />
+                                <TextBlock AutomationProperties.HeadingLevel="Level2" Style="{StaticResource PromptNestFieldLabelStyle}" Text="Data management" />
                                 <StackPanel Orientation="Horizontal">
                                     <Button
+                                        Click="OnImportPromptsClick"
                                         Margin="0,0,8,8"
+                                        AutomationProperties.Name="Import prompts"
                                         Content="Import"
-                                        IsEnabled="False"
-                                        ToolTipService.ToolTip="Import UI is wired in P5.3/P6 after picker packaging work." />
+                                        ToolTipService.ToolTip="Import a PromptNest JSON file." />
                                     <Button
+                                        Click="OnExportPromptsClick"
                                         Margin="0,0,8,8"
+                                        AutomationProperties.Name="Export prompts"
                                         Content="Export"
-                                        IsEnabled="False"
-                                        ToolTipService.ToolTip="Export UI is wired in P5.3/P6 after picker packaging work." />
+                                        ToolTipService.ToolTip="Export the current PromptNest library to JSON." />
                                     <Button
+                                        Click="OnCreateBackupClick"
                                         Margin="0,0,8,8"
+                                        AutomationProperties.Name="Create backup"
                                         Content="Create backup"
-                                        IsEnabled="False"
-                                        ToolTipService.ToolTip="Backup entry point is disabled until final file-picker flow is available." />
+                                        ToolTipService.ToolTip="Create a local backup before major imports." />
                                 </StackPanel>
+                                <TextBlock
+                                    Foreground="{StaticResource PromptNestTextSecondaryBrush}"
+                                    Text="{Binding DataManagementStatusText}"
+                                    TextWrapping="Wrap" />
                                 <CheckBox Content="Keep last 7 backups" IsChecked="True" />
                             </StackPanel>
                             <StackPanel Spacing="8">
-                                <TextBlock Foreground="{StaticResource PromptNestTextPrimaryBrush}" Text="Updates" />
+                                <TextBlock AutomationProperties.HeadingLevel="Level2" Style="{StaticResource PromptNestFieldLabelStyle}" Text="Updates" />
                                 <ComboBox IsEnabled="False" SelectedIndex="0">
                                     <ComboBoxItem Content="Stable" />
                                     <ComboBoxItem Content="Beta" />
@@ -760,7 +799,7 @@
                                     TextWrapping="Wrap" />
                             </StackPanel>
                             <StackPanel Spacing="8">
-                                <TextBlock Foreground="{StaticResource PromptNestTextPrimaryBrush}" Text="Tray menu" />
+                                <TextBlock AutomationProperties.HeadingLevel="Level2" Style="{StaticResource PromptNestFieldLabelStyle}" Text="Tray menu" />
                                 <ItemsControl x:Name="TrayCommandList">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
@@ -802,6 +841,7 @@
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <Grid>
                             <Button
+                                AutomationProperties.Name="Edit tab, selected"
                                 Content="Edit"
                                 Foreground="{StaticResource PromptNestTextPrimaryBrush}"
                                 Style="{StaticResource PromptNestCommandTabStyle}" />
@@ -809,15 +849,19 @@
                                 Height="2"
                                 HorizontalAlignment="Stretch"
                                 VerticalAlignment="Bottom"
+                                AutomationProperties.AccessibilityView="Raw"
                                 Background="{StaticResource PromptNestAccentBrush}" />
                         </Grid>
                         <Button
+                            AutomationProperties.Name="Preview tab"
                             Content="Preview"
                             Style="{StaticResource PromptNestCommandTabStyle}" />
                         <Button
+                            AutomationProperties.Name="Variables tab"
                             Content="Variables"
                             Style="{StaticResource PromptNestCommandTabStyle}" />
                         <Button
+                            AutomationProperties.Name="History tab"
                             Content="History"
                             Style="{StaticResource PromptNestCommandTabStyle}" />
                         <Button
@@ -825,9 +869,10 @@
                             Height="{StaticResource PromptNestIconButtonSize}"
                             AutomationProperties.Name="More editor actions"
                             Background="Transparent"
-                            BorderBrush="Transparent">
+                            BorderBrush="Transparent"
+                            ToolTipService.ToolTip="More editor actions">
                             <FontIcon
-                                FontSize="14"
+                                FontSize="{StaticResource PromptNestIconGlyphMedium}"
                                 Foreground="{StaticResource PromptNestIconDefaultBrush}"
                                 Glyph="&#xE712;" />
                         </Button>
@@ -838,12 +883,12 @@
                         Height="{StaticResource PromptNestIconButtonSize}"
                         AutomationProperties.Name="Expand editor"
                         Background="Transparent"
-                        BorderBrush="Transparent">
-                            <FontIcon
-                                FontSize="14"
-                                Foreground="{StaticResource PromptNestIconDefaultBrush}"
-                                Glyph="&#xE740;"
-                                ToolTipService.ToolTip="Expand editor" />
+                        BorderBrush="Transparent"
+                        ToolTipService.ToolTip="Expand editor">
+                        <FontIcon
+                            FontSize="{StaticResource PromptNestIconGlyphMedium}"
+                            Foreground="{StaticResource PromptNestIconDefaultBrush}"
+                            Glyph="&#xE740;" />
                     </Button>
                 </Grid>
 
@@ -852,11 +897,15 @@
                     Margin="0,14,0,12"
                     Spacing="10">
                     <TextBlock
-                        Foreground="{StaticResource PromptNestTextPrimaryBrush}"
+                        x:Name="TitleLabel"
+                        Style="{StaticResource PromptNestFieldLabelStyle}"
                         Text="Title" />
                     <TextBox
                         x:Name="TitleBox"
                         AutomationProperties.AutomationId="PromptNest.TitleBox"
+                        AutomationProperties.LabeledBy="{Binding ElementName=TitleLabel}"
+                        AutomationProperties.Name="Prompt title"
+                        PlaceholderText="Untitled prompt"
                         TextChanged="OnTitleTextChanged"
                         Text="{Binding Library.SelectedPrompt.Title, Mode=OneWay}"
                         Style="{StaticResource PromptNestSearchBoxStyle}" />
@@ -867,14 +916,18 @@
                         </Grid.ColumnDefinitions>
                         <StackPanel Spacing="8">
                             <TextBlock
-                                Foreground="{StaticResource PromptNestTextPrimaryBrush}"
+                                x:Name="FolderLabel"
+                                Style="{StaticResource PromptNestFieldLabelStyle}"
                                 Text="Folder" />
                             <Button
                                 Height="34"
                                 HorizontalContentAlignment="Stretch"
+                                AutomationProperties.LabeledBy="{Binding ElementName=FolderLabel}"
+                                AutomationProperties.Name="Select folder"
                                 Background="{StaticResource PromptNestEditorBrush}"
                                 BorderBrush="{StaticResource PromptNestBorderMutedBrush}"
-                                CornerRadius="{StaticResource PromptNestControlRadius}">
+                                CornerRadius="{StaticResource PromptNestControlRadius}"
+                                ToolTipService.ToolTip="Choose a folder for this prompt">
                                 <Grid ColumnSpacing="8">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto" />
@@ -900,7 +953,8 @@
                         </StackPanel>
                         <StackPanel Grid.Column="1" Spacing="8">
                             <TextBlock
-                                Foreground="{StaticResource PromptNestTextPrimaryBrush}"
+                                x:Name="TagsLabel"
+                                Style="{StaticResource PromptNestFieldLabelStyle}"
                                 Text="Tags" />
                             <Border
                                 MinHeight="34"
@@ -924,17 +978,19 @@
                                                             Foreground="{StaticResource PromptNestTextSecondaryBrush}"
                                                             Text="{Binding Name}" />
                                                         <Button
-                                                            Width="18"
-                                                            Height="18"
-                                                            AutomationProperties.Name="Remove tag"
+                                                            Width="{StaticResource PromptNestChipRemoveSize}"
+                                                            Height="{StaticResource PromptNestChipRemoveSize}"
+                                                            AutomationProperties.Name="{Binding RemoveAccessibleName}"
                                                             Background="Transparent"
                                                             BorderBrush="Transparent"
                                                             Click="OnRemoveTagClick"
+                                                            CornerRadius="{StaticResource PromptNestControlRadius}"
                                                             Padding="0"
-                                                            Tag="{Binding Name}">
+                                                            Tag="{Binding Name}"
+                                                            ToolTipService.ToolTip="{Binding RemoveAccessibleName}">
                                                             <FontIcon
-                                                                FontSize="8"
-                                                                Foreground="{StaticResource PromptNestIconMutedBrush}"
+                                                                FontSize="{StaticResource PromptNestIconGlyphSmall}"
+                                                                Foreground="{StaticResource PromptNestIconDefaultBrush}"
                                                                 Glyph="&#xE711;" />
                                                         </Button>
                                                     </StackPanel>
@@ -944,9 +1000,12 @@
                                     </ItemsControl>
                                     <TextBox
                                         x:Name="TagInput"
-                                        MinWidth="92"
+                                        MinWidth="96"
                                         Height="24"
+                                        VerticalAlignment="Center"
                                         AutomationProperties.AutomationId="PromptNest.TagInput"
+                                        AutomationProperties.LabeledBy="{Binding ElementName=TagsLabel}"
+                                        AutomationProperties.Name="Add tag"
                                         Background="Transparent"
                                         BorderThickness="0"
                                         KeyDown="OnTagInputKeyDown"
@@ -1003,10 +1062,12 @@
                             BorderThickness="0,0,1,0">
                             <TextBlock
                                 x:Name="EditorLineNumbers"
-                                Padding="0,10,8,0"
+                                Padding="0,12,8,0"
+                                AutomationProperties.AccessibilityView="Raw"
                                 FontFamily="{StaticResource PromptNestFontFamilyEditor}"
                                 FontSize="{StaticResource PromptNestFontSizeEditor}"
                                 Foreground="{StaticResource PromptNestTextTertiaryBrush}"
+                                IsHitTestVisible="False"
                                 Text="1"
                                 TextAlignment="Right" />
                         </Border>
@@ -1015,7 +1076,10 @@
                             Grid.Column="1"
                             AcceptsReturn="True"
                             AutomationProperties.AutomationId="PromptNest.PromptBodyEditor"
+                            AutomationProperties.Name="Prompt body"
+                            AutomationProperties.HelpText="Edit the prompt body. Press Control plus E to focus."
                             BorderThickness="0"
+                            PlaceholderText="Write your prompt..."
                             SelectionChanged="OnPromptBodySelectionChanged"
                             ScrollViewer.VerticalScrollBarVisibility="Auto"
                             Text="{Binding Library.SelectedPrompt.Body, Mode=OneWay}"
@@ -1052,23 +1116,28 @@
                             Orientation="Horizontal"
                             Spacing="8">
                             <Button
-                                Width="28"
-                                Height="28"
+                                Width="{StaticResource PromptNestSmallIconButtonSize}"
+                                Height="{StaticResource PromptNestSmallIconButtonSize}"
                                 AutomationProperties.Name="Editor text size"
                                 Background="Transparent"
                                 BorderBrush="Transparent"
                                 Content="Aa"
+                                CornerRadius="{StaticResource PromptNestControlRadius}"
                                 FontSize="{StaticResource PromptNestFontSizeBodySmall}"
-                                Foreground="{StaticResource PromptNestTextSecondaryBrush}" />
+                                Foreground="{StaticResource PromptNestTextSecondaryBrush}"
+                                Padding="0"
+                                ToolTipService.ToolTip="Editor text size" />
                             <Button
-                                Width="28"
-                                Height="28"
+                                Width="{StaticResource PromptNestSmallIconButtonSize}"
+                                Height="{StaticResource PromptNestSmallIconButtonSize}"
                                 AutomationProperties.Name="Expand prompt editor"
                                 Background="Transparent"
                                 BorderBrush="Transparent"
-                                Padding="0">
+                                CornerRadius="{StaticResource PromptNestControlRadius}"
+                                Padding="0"
+                                ToolTipService.ToolTip="Expand prompt editor">
                                 <FontIcon
-                                    FontSize="14"
+                                    FontSize="{StaticResource PromptNestIconGlyphMedium}"
                                     Foreground="{StaticResource PromptNestIconDefaultBrush}"
                                     Glyph="&#xE740;" />
                             </Button>
@@ -1142,16 +1211,18 @@
                                                 Text="{Binding PreviewValue, Mode=OneWay}" />
                                             <Button
                                                 Grid.Column="4"
-                                                Width="28"
-                                                Height="28"
-                                                AutomationProperties.Name="Variable action"
+                                                Width="{StaticResource PromptNestSmallIconButtonSize}"
+                                                Height="{StaticResource PromptNestSmallIconButtonSize}"
+                                                AutomationProperties.Name="Delete variable"
                                                 Background="Transparent"
                                                 BorderBrush="Transparent"
+                                                CornerRadius="{StaticResource PromptNestControlRadius}"
                                                 IsEnabled="{Binding CanDelete}"
-                                                Padding="0">
+                                                Padding="0"
+                                                ToolTipService.ToolTip="Delete variable">
                                                 <FontIcon
-                                                    FontSize="12"
-                                                    Foreground="{StaticResource PromptNestIconMutedBrush}"
+                                                    FontSize="{StaticResource PromptNestIconGlyphSmall}"
+                                                    Foreground="{StaticResource PromptNestIconDefaultBrush}"
                                                     Glyph="&#xE74D;" />
                                             </Button>
                                         </Grid>
@@ -1180,32 +1251,43 @@
                         <Button
                             MinWidth="86"
                             Height="34"
+                            AccessKey="C"
                             AutomationProperties.AutomationId="PromptNest.CopyButton"
+                            AutomationProperties.Name="Copy prompt to clipboard"
                             Background="{StaticResource PromptNestPaneElevatedBrush}"
                             BorderBrush="Transparent"
                             Click="OnCopySelectedPromptClick"
                             Content="Copy"
-                            Foreground="{StaticResource PromptNestTextPrimaryBrush}" />
+                            CornerRadius="{StaticResource PromptNestControlRadius}"
+                            Foreground="{StaticResource PromptNestTextPrimaryBrush}"
+                            ToolTipService.ToolTip="Copy prompt to clipboard" />
                         <Button
                             MinWidth="86"
                             Height="34"
+                            AccessKey="S"
                             AutomationProperties.AutomationId="PromptNest.SaveButton"
+                            AutomationProperties.Name="Save prompt"
                             Background="{StaticResource PromptNestAccentBrush}"
                             BorderBrush="Transparent"
                             Click="OnSaveEditorClick"
                             Content="Save"
+                            CornerRadius="{StaticResource PromptNestControlRadius}"
                             Foreground="{StaticResource PromptNestIconSelectedBrush}"
-                            IsEnabled="{Binding Library.CanSave}" />
+                            IsEnabled="{Binding Library.CanSave}"
+                            ToolTipService.ToolTip="Save changes (Ctrl+S)" />
                         <Button
                             MinWidth="86"
                             Height="34"
                             AutomationProperties.AutomationId="PromptNest.CancelButton"
+                            AutomationProperties.Name="Cancel changes"
                             Background="{StaticResource PromptNestPaneElevatedBrush}"
                             BorderBrush="Transparent"
                             Click="OnCancelEditorClick"
                             Content="Cancel"
+                            CornerRadius="{StaticResource PromptNestControlRadius}"
                             Foreground="{StaticResource PromptNestTextPrimaryBrush}"
-                            IsEnabled="{Binding Library.CanCancel}" />
+                            IsEnabled="{Binding Library.CanCancel}"
+                            ToolTipService.ToolTip="Discard unsaved changes" />
                     </StackPanel>
                 </Grid>
             </Grid>

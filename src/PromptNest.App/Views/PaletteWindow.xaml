@@ -8,6 +8,7 @@
         Width="600"
         Height="420"
         Padding="16"
+        AutomationProperties.Name="PromptNest quick palette"
         Background="{StaticResource PromptNestEditorBrush}"
         RowSpacing="12">
         <Grid.RowDefinitions>
@@ -19,6 +20,8 @@
         <TextBox
             x:Name="PaletteSearchBox"
             AutomationProperties.AutomationId="PromptNest.PaletteSearchBox"
+            AutomationProperties.Name="Search prompts"
+            AutomationProperties.HelpText="Type to search. Down arrow next, up arrow previous, Enter to copy, Escape to close."
             PlaceholderText="Search prompts"
             Style="{StaticResource PromptNestSearchBoxStyle}"
             TextChanged="OnSearchTextChanged" />
@@ -26,6 +29,7 @@
         <ListView
             Grid.Row="1"
             AutomationProperties.AutomationId="PromptNest.PaletteResultList"
+            AutomationProperties.Name="Search results"
             Background="Transparent"
             BorderThickness="0"
             ItemClick="OnResultClick"
@@ -59,13 +63,15 @@
         <Grid Grid.Row="2">
             <TextBlock
                 VerticalAlignment="Center"
+                AutomationProperties.LiveSetting="Polite"
                 Style="{StaticResource PromptNestStatusTextStyle}"
                 Text="{Binding StatusText}" />
             <TextBlock
                 HorizontalAlignment="Right"
                 VerticalAlignment="Center"
+                AutomationProperties.AccessibilityView="Raw"
                 Style="{StaticResource PromptNestStatusTextStyle}"
-                Text="Enter copy   Alt+Enter edit   Esc close" />
+                Text="Enter: copy   Alt+Enter: edit   Esc: close" />
         </Grid>
     </Grid>
 </Window>

@@ -21,6 +21,9 @@ public static class DependencyInjection
         services.AddSingleton<IPromptCopyService, PromptCopyService>();
         services.AddSingleton<IImportExportService, ImportExportService>();
         services.AddSingleton<IBackupService, BackupService>();
+        services.AddSingleton<IRepositoryPromptScanner, RepositoryPromptScanner>();
+        services.AddSingleton<IRepositoryPromptImportNormalizer, RepositoryPromptImportNormalizer>();
+        services.AddSingleton<ILinearBatchReportFormatter, LinearBatchReportFormatter>();
 
         return services;
     }

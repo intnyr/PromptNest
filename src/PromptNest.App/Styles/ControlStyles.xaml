@@ -11,6 +11,33 @@
         <Setter Property="Foreground" Value="{StaticResource PromptNestTextPrimaryBrush}" />
         <Setter Property="FontFamily" Value="{StaticResource PromptNestFontFamilyUi}" />
         <Setter Property="FontSize" Value="{StaticResource PromptNestFontSizeBody}" />
+        <Setter Property="UseSystemFocusVisuals" Value="True" />
+        <Setter Property="FocusVisualPrimaryBrush" Value="{StaticResource PromptNestFocusStrokeBrush}" />
+        <Setter Property="FocusVisualSecondaryBrush" Value="{StaticResource PromptNestFocusStrokeOuterBrush}" />
+        <Setter Property="FocusVisualPrimaryThickness" Value="{StaticResource PromptNestFocusStrokeThickness}" />
+    </Style>
+
+    <Style x:Key="PromptNestIconButtonStyle" TargetType="Button" BasedOn="{StaticResource PromptNestToolbarButtonStyle}">
+        <Setter Property="MinWidth" Value="{StaticResource PromptNestIconButtonSize}" />
+        <Setter Property="Width" Value="{StaticResource PromptNestIconButtonSize}" />
+        <Setter Property="Height" Value="{StaticResource PromptNestIconButtonSize}" />
+        <Setter Property="Padding" Value="0" />
+    </Style>
+
+    <Style x:Key="PromptNestSectionHeaderStyle" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource PromptNestFontFamilyUi}" />
+        <Setter Property="FontSize" Value="{StaticResource PromptNestFontSizeCaption}" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="CharacterSpacing" Value="{StaticResource PromptNestSectionHeaderSpacing}" />
+        <Setter Property="Foreground" Value="{StaticResource PromptNestTextTertiaryBrush}" />
+        <Setter Property="AutomationProperties.HeadingLevel" Value="Level2" />
+    </Style>
+
+    <Style x:Key="PromptNestFieldLabelStyle" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource PromptNestFontFamilyUi}" />
+        <Setter Property="FontSize" Value="{StaticResource PromptNestFontSizeBodySmall}" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{StaticResource PromptNestTextPrimaryBrush}" />
     </Style>
 
     <Style x:Key="PromptNestPrimaryToolbarButtonStyle" TargetType="Button" BasedOn="{StaticResource PromptNestToolbarButtonStyle}">
@@ -25,9 +52,10 @@
         <Setter Property="Background" Value="{StaticResource PromptNestPaneBrush}" />
         <Setter Property="BorderBrush" Value="{StaticResource PromptNestBorderStrongBrush}" />
         <Setter Property="Foreground" Value="{StaticResource PromptNestTextPrimaryBrush}" />
-        <Setter Property="PlaceholderForeground" Value="{StaticResource PromptNestTextTertiaryBrush}" />
+        <Setter Property="PlaceholderForeground" Value="{StaticResource PromptNestPlaceholderBrush}" />
         <Setter Property="FontFamily" Value="{StaticResource PromptNestFontFamilyUi}" />
         <Setter Property="FontSize" Value="{StaticResource PromptNestFontSizeBodyLarge}" />
+        <Setter Property="UseSystemFocusVisuals" Value="True" />
     </Style>
 
     <Style x:Key="PromptNestPromptListRowStyle" TargetType="ListViewItem">
@@ -68,8 +96,11 @@
         <Setter Property="Background" Value="{StaticResource PromptNestEditorBrush}" />
         <Setter Property="BorderBrush" Value="{StaticResource PromptNestBorderMutedBrush}" />
         <Setter Property="Foreground" Value="{StaticResource PromptNestTextPrimaryBrush}" />
+        <Setter Property="PlaceholderForeground" Value="{StaticResource PromptNestPlaceholderBrush}" />
+        <Setter Property="SelectionHighlightColor" Value="{StaticResource PromptNestAccentBrush}" />
         <Setter Property="FontFamily" Value="{StaticResource PromptNestFontFamilyEditor}" />
         <Setter Property="FontSize" Value="{StaticResource PromptNestFontSizeEditor}" />
+        <Setter Property="UseSystemFocusVisuals" Value="True" />
     </Style>
 
     <Style x:Key="PromptNestStatusTextStyle" TargetType="TextBlock">
