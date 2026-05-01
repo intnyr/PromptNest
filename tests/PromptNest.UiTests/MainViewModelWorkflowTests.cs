@@ -204,6 +204,33 @@ public sealed class MainViewModelWorkflowTests
         viewModel.Library.CanCancel.Should().BeFalse();
     }
 
+    [Fact]
+    public async Task DataManagementMethodsUseImportExportAndBackupServices()
+    {
+        var services = new ViewModelServiceFixture();
+        var viewModel = services.CreateViewModel();
+        await viewModel.LoadAsync(CancellationToken.None);
+
+        PromptNestExport export = new()
+        {
+            ExportedAt = DateTimeOffset.UtcNow,
+            Prompts = [SamplePrompt]
+        };
+
+        OperationResult<ImportPlan> preview = await viewModel.PreviewImportAsync(export, new ImportOptions { DryRun = true }, CancellationToken.None);
+        OperationResult<ImportSummary> import = await viewModel.ImportAsync(export, new ImportOptions(), CancellationToken.None);
+        OperationResult<PromptNestExport> exported = await viewModel.ExportPromptsAsync(CancellationToken.None);
+        OperationResult<BackupMetadata> backup = await viewModel.CreateBackupAsync(CancellationToken.None);
+
+        preview.Succeeded.Should().BeTrue();
+        import.Succeeded.Should().BeTrue();
+        exported.Value?.Prompts.Should().ContainSingle(prompt => prompt.Id == SamplePrompt.Id);
+        backup.Succeeded.Should().BeTrue();
+        services.ImportExportService.ImportCalls.Should().Be(1);
+        services.BackupService.BackupCalls.Should().Be(1);
+        viewModel.DataManagementStatusText.Should().Contain("Backup created");
+    }
+
     private sealed class ViewModelServiceFixture
     {
         public FakePromptService PromptService { get; } = new();
@@ -222,6 +249,10 @@ public sealed class MainViewModelWorkflowTests
 
         public FakeUpdateService UpdateService { get; } = new();
 
+        public FakeImportExportService ImportExportService { get; } = new();
+
+        public FakeBackupService BackupService { get; } = new();
+
         public MainViewModel CreateViewModel() => new(
             PromptService,
             FolderService,
@@ -230,7 +261,9 @@ public sealed class MainViewModelWorkflowTests
             PromptCopyService,
             JumpListService,
             SettingsRepository,
-            UpdateService);
+            UpdateService,
+            ImportExportService,
+            BackupService);
 
         public static async Task WaitForAsync(Func<bool> condition)
         {
@@ -469,6 +502,70 @@ public sealed class MainViewModelWorkflowTests
                         Message = "PromptNest is up to date"
                     }));
         }
+    }
+
+    private sealed class FakeImportExportService : IImportExportService
+    {
+        public int ImportCalls { get; private set; }
+
+        public Task<OperationResult<PromptNestExport>> ExportAsync(CancellationToken cancellationToken) =>
+            Task.FromResult(OperationResultFactory.Success(
+                new PromptNestExport
+                {
+                    ExportedAt = DateTimeOffset.UtcNow,
+                    Prompts = [SamplePrompt]
+                }));
+
+        public Task<OperationResult<ImportSummary>> ImportAsync(
+            PromptNestExport exportData,
+            ImportOptions options,
+            CancellationToken cancellationToken)
+        {
+            ImportCalls++;
+            return Task.FromResult(OperationResultFactory.Success(
+                new ImportSummary
+                {
+                    PromptsCreated = exportData.Prompts.Count,
+                    DryRun = options.DryRun
+                }));
+        }
+
+        public Task<OperationResult<ImportPlan>> PreviewImportAsync(
+            PromptNestExport exportData,
+            ImportOptions options,
+            CancellationToken cancellationToken) =>
+            Task.FromResult(OperationResultFactory.Success(
+                new ImportPlan
+                {
+                    Summary = new ImportSummary
+                    {
+                        PromptsCreated = exportData.Prompts.Count,
+                        DryRun = true
+                    }
+                }));
+    }
+
+    private sealed class FakeBackupService : IBackupService
+    {
+        public int BackupCalls { get; private set; }
+
+        public Task<OperationResult> ApplyRetentionAsync(int keepLast, CancellationToken cancellationToken) =>
+            Task.FromResult(OperationResult.Success());
+
+        public Task<OperationResult<BackupMetadata>> CreateBackupAsync(CancellationToken cancellationToken)
+        {
+            BackupCalls++;
+            return Task.FromResult(OperationResultFactory.Success(
+                new BackupMetadata
+                {
+                    FilePath = "backup.db",
+                    CreatedAt = DateTimeOffset.UtcNow,
+                    SizeBytes = 1
+                }));
+        }
+
+        public Task<IReadOnlyList<BackupMetadata>> ListBackupsAsync(CancellationToken cancellationToken) =>
+            Task.FromResult<IReadOnlyList<BackupMetadata>>([]);
     }
 
     private static Prompt SamplePrompt => new()

@@ -54,3 +54,5 @@ dotnet build PromptNest.sln
 ```
 
 Developer setup, verification, packaging, and troubleshooting are documented in `docs/developer-setup.md`.
+
+Repository prompt import automation is documented in `docs/repository-prompt-import-runbook.md`.
